@@ -6,8 +6,11 @@ import "errors"
 var gofile string = "%s\nfunc Render%s(gok *Gok){\n%s\n}";
 
 func processGok(code string) (string , error) {
-    imports, r := getImports(code);
-    goCode , err := buildGoCode(code[r:]);
+    imports, r, err := buildImports(code);
+    if err != nil {
+        return "", err;
+    }
+    goCode, err := buildGoCode(code[r:]);
     if err != nil {
         return "", err;
     }
@@ -15,8 +18,26 @@ func processGok(code string) (string , error) {
     return goCode, nil;
 }
 
-func getImports(code string) (string, int) {
-
+func buildImports(code string) (string, int, error) {
+    p := "<?go-imports"
+    pe := "?>";
+    plen := len(p);
+    indx := strings.Index(code, p);
+    if indx == -1 {
+        return "", 0;
+    }
+    indxEnd := strings.Index(code, pe);
+    if indxEnd == -1 {
+        return "", errors.New("unknown code pattern");
+    }
+    if indxEnd == (indx + plen) {
+        return "", nil;
+    }
+    imports := strings.Split(code[(indx+plen):indxEnd], "\n");
+    for i := range imports {
+        imports[i] = strings.TrimSpace(imports[i]);
+    }
+    return strings.Join(imports, "\n"), nil;
 }
 
 func buildGoCode(code) (string, error){
