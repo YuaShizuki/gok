@@ -40,6 +40,7 @@ func buildImports(code string) (string, int, error) {
 }
 
 func buildGoCode(code string) (string, error) {
+    echoFunc := "\ngok.Echo(\"%s\")\n";
     p := "<?go ";
     pe := "?>";
     codeLen := len(code);
@@ -49,10 +50,14 @@ func buildGoCode(code string) (string, error) {
         indx := strings.Index(slice, p);
         if indx == -1 {
             if len(slice) > 0 {
-                echo := fmt.Sprintf("\ngok.Echo(\"%s\")\n", strToCStr(slice));
+                echo := fmt.Sprintf(echoFunc, strToCStr(slice));
                 result = append(result, echo...);
             }
             break;
+        }
+        if indx != 0 {
+            echo := fmt.Sprintf(echoFunc, strToCStr(slice[0:indx]))
+            result = append(result, echo...);
         }
         indxEnd := strings.Index(slice, pe);
         if indxEnd == -1 {
