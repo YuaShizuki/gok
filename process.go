@@ -44,7 +44,7 @@ func buildGoCode(code string) (string, error){
     p := "<?go ";
     pe := "?>";
     codeLen := len(code);
-    result := make([]byte, 0, coldLen*3);
+    result := make([]byte, 0, codeLen*3);
     for last := 0; last < codeLen; {
         slice := code[last:];
         indx := strings.Index(slice, p);
