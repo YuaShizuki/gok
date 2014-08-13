@@ -24,23 +24,23 @@ func buildImports(code string) (string, int, error) {
     plen := len(p);
     indx := strings.Index(code, p);
     if indx == -1 {
-        return "", 0;
+        return "", 0, nil;
     }
     indxEnd := strings.Index(code, pe);
     if indxEnd == -1 {
-        return "", errors.New("unknown code pattern");
+        return "", -1, errors.New("unknown code pattern");
     }
     if indxEnd == (indx + plen) {
-        return "", nil;
+        return "", -1, nil;
     }
     imports := strings.Split(code[(indx+plen):indxEnd], "\n");
     for i := range imports {
         imports[i] = strings.TrimSpace(imports[i]);
     }
-    return strings.Join(imports, "\n"), nil;
+    return strings.Join(imports, "\n"), (indxEnd+2), nil;
 }
 
-func buildGoCode(code) (string, error){
+func buildGoCode(code string) (string, error){
     p := "<?go ";
     pe := "?>";
     codeLen := len(code);
