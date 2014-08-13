@@ -3,9 +3,8 @@ import "fmt"
 import "strings"
 import "errors"
 
-var gofile string = "%s\nfunc Render%s(gok *Gok){\n%s\n}";
-
 func processGok(code string) (string , error) {
+    var gofile string = "%s\nfunc Render%s(gok *Gok){\n%s\n}";
     imports, r, err := buildImports(code);
     if err != nil {
         return "", err;
@@ -15,7 +14,7 @@ func processGok(code string) (string , error) {
         return "", err;
     }
     final := fmt.Sprintf(gofile, imports , genRandName(), goCode);
-    return goCode, nil;
+    return final, nil;
 }
 
 func buildImports(code string) (string, int, error) {
@@ -40,7 +39,7 @@ func buildImports(code string) (string, int, error) {
     return strings.Join(imports, "\n"), (indxEnd+2), nil;
 }
 
-func buildGoCode(code string) (string, error){
+func buildGoCode(code string) (string, error) {
     p := "<?go ";
     pe := "?>";
     codeLen := len(code);
@@ -51,7 +50,7 @@ func buildGoCode(code string) (string, error){
         if indx == -1 {
             if len(slice) > 0 {
                 echo := fmt.Sprintf("\ngok.Echo(\"%s\")\n", strToCStr(slice));
-                result := append(result, echo...);
+                result = append(result, echo...);
             }
             break;
         }
@@ -59,21 +58,21 @@ func buildGoCode(code string) (string, error){
         if indxEnd == -1 {
             return "", errors.New("unknown code pattern");
         }
-        if (indxEnd) = (indx+5) {
+        if indxEnd == (indx+5) {
             last += indxEnd+2;
             continue;
         }
         goCode := strings.TrimSpace(slice[indx+5:indxEnd]);
         if len(goCode) != 0 {
             for _,v := range strings.Split(goCode, "\n") {
-                reuslt = append(result, '\n');
+                result = append(result, '\n');
                 result = append(result, strings.TrimSpace(v)...);
             }
         }
         last += indxEnd+2;
     }
+    return string(result), nil;
 }
-
 
 func strToCStr(str string) string {
     result := strings.Replace(str, "\n", "\\n", -1);
@@ -81,4 +80,5 @@ func strToCStr(str string) string {
     result = strings.Replace(result, "\r", "\\r", -1);
     result = strings.Replace(result, "\v", "\\v", -1);
     result = strings.Replace(result, "\f", "\\f", -1);
+    return result;
 }
