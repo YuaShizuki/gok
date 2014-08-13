@@ -1,0 +1,25 @@
+<?go-imports 
+   import "database/sql"
+   import "fmt" 
+?>
+<html>
+    <head>
+        <?go 
+            if gok.COOKIE["userId"] == "" {
+                gok.SetCookie(buildUser());
+            }
+        ?>
+    </head>
+    <body>  
+    <?go for i := 0; i < 10; i++ { ?>
+        <p><?go gok.echo(i) ?></p>
+    <?go } ?>
+    <img src=<?go gok.echo(sql.QueryUserPic(gok.GET["usrId"])) ?> />
+    </body>
+</html>
+<?go 
+    for k,v := range gok.POST {
+            fmt.Println(k,":",v);
+    }
+    fmt.Println("sent request "+ gok.SERVER["GOK_SELF"]);
+?>
