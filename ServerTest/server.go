@@ -2,13 +2,17 @@ package main
 import "fmt"
 import "net/http"
 
-func index(w http.ResponseWriter, r *http.Request) {
-    w.Write([]byte("Hello World!"));
+type Gok struct {
+}
+
+type mainHandler struct{};
+func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintln(w, "<html>", "Javc", 32, "</html>");
 }
 
 func main() {
-    http.HandleFunc("/", index)
-    err := http.ListenAndServe(":80", nil);
+    http.Handle("/", new(mainHandler))
+    err := http.ListenAndServe(":8080", nil);
     if err != nil {
         fmt.Println(err);
     }
