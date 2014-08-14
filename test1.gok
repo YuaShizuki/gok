@@ -3,8 +3,9 @@
 ?> 
 <html>
     <body>
-        <?go for i:= 0; i < 100; i++ { >
+        <?go for i := 0; i < 100; i++ { ?>
             <p>Hello World!</p>
         <?go } ?>
     </body>
 </html>
+<?go fmt.Println("responded to request => /test1") ?>
