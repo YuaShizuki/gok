@@ -41,7 +41,7 @@ func buildImports(code string) (string, int, error) {
 }
 
 func buildGoCode(code string) (string, error) {
-    echoFunc := "\ngok.Echo(\"%s\");\n";
+    echoFunc := "\ngok.Echo(\"%s\");";
     p := "<?go ";
     pe := "?>";
     codeLen := len(code);
