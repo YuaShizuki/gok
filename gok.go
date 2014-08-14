@@ -9,15 +9,18 @@ var (
 
 func main() {
     files,_:= filepath.Glob("./*."+fileExtension);
-    for _,v := range files {
+    funcNames := make([]string, len(files));
+    for i, v := range files {
         content, err := ioutil.ReadFile(v);
         if err != nil {
             errExit(err, "");
         }
-        go_code,err := processGok(string(content));
+        goCode, funcName ,err := processGok(string(content));
         if err != nil {
             errExit(err, "");
         }
-        fmt.Println(go_code);
+        funcNames[i] = funcName;
+        fmt.Println(goCode);
     }
+    fmt.Println(funcNames)
 }

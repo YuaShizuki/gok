@@ -3,18 +3,19 @@ import "fmt"
 import "strings"
 import "errors"
 
-func processGok(code string) (string , error) {
-    var gofile string = "%s\nfunc Render%s(gok *Gok){\n%s\n}";
+func processGok(code string) (string, string, error) {
+    var gofile string = "%s\nfunc %s(gok *Gok){\n%s\n}";
+    funcName := fmt.Sprintf("Render%s", genRandName());
     imports, r, err := buildImports(code);
     if err != nil {
-        return "", err;
+        return "", "", err;
     }
     goCode, err := buildGoCode(code[r:]);
     if err != nil {
-        return "", err;
+        return "", "", err;
     }
-    final := fmt.Sprintf(gofile, imports , genRandName(), goCode);
-    return final, nil;
+    final := fmt.Sprintf(gofile, imports , funcName, goCode);
+    return final, funcName, nil;
 }
 
 func buildImports(code string) (string, int, error) {
