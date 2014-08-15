@@ -30,7 +30,7 @@ func (self *Gok) ServerRemoteAddr() string {
     return strings.Split(self.r.RemoteAddr, ":")[0];
 }
 func (self *Gok) ServerRemotePort() string {
-    return strings.Split(self.r.RmoteAddr, ":")[1];
+    return strings.Split(self.r.RemoteAddr, ":")[1];
 }
 func (self *Gok) ServerPort() int {
     return 80;
@@ -57,10 +57,10 @@ func (self *Gok) ServerHttpAcceptLanguage() string {
     return strings.Join(self.r.Header["Accept-Language"], " ");
 }
 func (self *Gok) ServerHttpConnection() string {
-    return self.r.Header["Connection"];
+    return strings.Join(self.r.Header["Connection"], " ");
 }
 func (self *Gok) ServerHttpHost() string {
-    return self.r.Header["Host"];
+    return strings.Join(self.r.Header["Host"], " ");
 }
 
 
@@ -98,5 +98,5 @@ func (self *Gok) RequestHeader() map[string]string { return nil; }
 func (self *Gok) ResponseHeader() map[string]string { return nil; }
 
 /*- Request/Writer -*/
-func (self *Gok) RequestWriter() http.ResponseWriter { return w; }
-func (self *Gok) HttpRequest() *http.Request { return r; }
+func (self *Gok) RequestWriter() http.ResponseWriter { return self.w; }
+func (self *Gok) HttpRequest() *http.Request { return self.r; }
