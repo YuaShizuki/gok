@@ -2,6 +2,7 @@ package main
 import "fmt"
 import "net/http"
 improt "url"
+import "time"
 
 type Gok struct {
     w http.ResponseWriter;
@@ -61,17 +62,37 @@ func (gok *Gok) ServerHttpHost() string {
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_GET && $_POST <<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 
-func (gok *Gok) Post(string) []byte {}
-func (gok *Gok) Get(string) string {}
+func (gok *Gok) Post(name string) []byte {
+    return nil;
+}
+func (gok *Gok) Get(name string) string {
+    return "";
+}
 
-/*- $_COOKIE -*/
-func (gok *Gok) Cookie(string) string {}
-func (gok *Gok) SetCookie(string, string) {}
+/*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  $_COOKIE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
+func (gok *Gok) Cookie(name string) string {
+    return "";
+}
+func (gok *Gok) SetCookie(name string, value string, expires *time.Time) {
+}
+func (gok *Gok) SetCookie_4(name string, value string, expires *time.Time, path string){
+}
+func (gok *Gok) SetCookie_5(name string, value string, expires *time.Time, path string,
+                            domain string){
+}
+func (gok *Gok) SetCookie_7(name string, value string, expires *time.Time, path string,
+                            domain string, secure bool, httpOnly bool) {
+}
+func (gok *Gok) UnSetCookie(name string) {
+}
+
 /*- $_FILE -*/
-func (gok *Gok) File(string) (string, uint32) {}
+func (gok *Gok) File(string) (string, uint32) { return "", 0; }
+
 /*- Headers -*/
-func (gok *Gok) RequestHeader() map[string]string {}
-func (gok *Gok) ResponseHeader() map[string]string {}
+func (gok *Gok) RequestHeader() map[string]string { return nil; }
+func (gok *Gok) ResponseHeader() map[string]string { return nil; }
+
 /*- Request/Writer -*/
-func (gok *Gok) RequestWriter() http.ResponseWriter {}
-func (gok *Gok) HttpRequest() *http.Request {}
+func (gok *Gok) RequestWriter() http.ResponseWriter { return w; }
+func (gok *Gok) HttpRequest() *http.Request { return r; }
