@@ -17,8 +17,12 @@ func (gok *Gok) ServerSelf() string {
     return gok.Url.Path;
 }
 func (gok *Gok) ServerHttpUserAgent() string {
-    return r.Header["User-Agent"];
+    return strings.Join(r.Header["User-Agent"], " ");
 }
+func (gok *Gok) ServerHttpReferer() string {
+    return strings.Join(r.Header["Referer"], " ");
+}
+
 func (gok *Gok) ServerHttps() bool {
     return r.URL.Scheme == "https";
 }
@@ -32,7 +36,7 @@ func (gok *Gok) ServerPort() int {
     return 80;
 }
 func (gok *Gok) ServerHttpAcceptEncoding() string {
-    return r.Header["Accept-Encoding"];
+    return strings.Join(r.Header["Accept-Encoding"], " ");
 }
 func (gok *Gok) ServerProtocol() string {
     return r.Proto;
@@ -44,19 +48,19 @@ func (gok *Gok) ServerQueryString() string {
     return r.URL.RawQuery
 }
 func (gok *Gok) ServerHttpAccept() string {
-    return r.Header["Accept"];
+    return strings.Join(r.Header["Accept"], " ");
 }
 func (gok *Gok) ServerHttpAcceptCharset() string {
-    return r.Header["Accept-Charset"];
+    return strings.Join(r.Header["Accept-Charset"], " ");
 }
 func (gok *Gok) ServerHttpAcceptLanguage() string {
-    return r.Header["Accept-Language"];
+    return strings.Join(r.Header["Accept-Language"], " ");
 }
 func (gok *Gok) ServerHttpConnection() string {
     return r.Header["Connection"];
 }
 func (gok *Gok) ServerHttpHost() string {
-    return r.Header["HOST"];
+    return r.Header["Host"];
 }
 
 
