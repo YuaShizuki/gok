@@ -1,102 +1,102 @@
 package main
 import "fmt"
 import "net/http"
-improt "url"
 import "time"
+import "strings"
 
 type Gok struct {
     w http.ResponseWriter;
     r *http.Request;
 };
 
-func (gok *Gok) Echo(a ...interface{}) {
-    fmt.Fprint(w, a...);
+func (self *Gok) Echo(a ...interface{}) {
+    fmt.Fprint(self.w, a...);
 }
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_SERVER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
-func (gok *Gok) ServerSelf() string {
-    return gok.Url.Path;
+func (self *Gok) ServerSelf() string {
+    return self.r.URL.Path;
 }
-func (gok *Gok) ServerHttpUserAgent() string {
-    return strings.Join(r.Header["User-Agent"], " ");
+func (self *Gok) ServerHttpUserAgent() string {
+    return strings.Join(self.r.Header["User-Agent"], " ");
 }
-func (gok *Gok) ServerHttpReferer() string {
-    return strings.Join(r.Header["Referer"], " ");
+func (self *Gok) ServerHttpReferer() string {
+    return strings.Join(self.r.Header["Referer"], " ");
 }
 
-func (gok *Gok) ServerHttps() bool {
-    return r.URL.Scheme == "https";
+func (self *Gok) ServerHttps() bool {
+    return self.r.URL.Scheme == "https";
 }
-func (gok *Gok) ServerRemoteAddr() string {
-    return strings.Split(r.RemoteAddr, ":")[0];
+func (self *Gok) ServerRemoteAddr() string {
+    return strings.Split(self.r.RemoteAddr, ":")[0];
 }
-func (gok *Gok) ServerRemotePort() string {
-    return strings.Split(r.RmoteAddr, ":")[1];
+func (self *Gok) ServerRemotePort() string {
+    return strings.Split(self.r.RmoteAddr, ":")[1];
 }
-func (gok *Gok) ServerPort() int {
+func (self *Gok) ServerPort() int {
     return 80;
 }
-func (gok *Gok) ServerHttpAcceptEncoding() string {
-    return strings.Join(r.Header["Accept-Encoding"], " ");
+func (self *Gok) ServerHttpAcceptEncoding() string {
+    return strings.Join(self.r.Header["Accept-Encoding"], " ");
 }
-func (gok *Gok) ServerProtocol() string {
-    return r.Proto;
+func (self *Gok) ServerProtocol() string {
+    return self.r.Proto;
 }
-func (gok *Gok) ServerRequestMethod() string {
-    return r.Method;
+func (self *Gok) ServerRequestMethod() string {
+    return self.r.Method;
 }
-func (gok *Gok) ServerQueryString() string {
-    return r.URL.RawQuery
+func (self *Gok) ServerQueryString() string {
+    return self.r.URL.RawQuery
 }
-func (gok *Gok) ServerHttpAccept() string {
-    return strings.Join(r.Header["Accept"], " ");
+func (self *Gok) ServerHttpAccept() string {
+    return strings.Join(self.r.Header["Accept"], " ");
 }
-func (gok *Gok) ServerHttpAcceptCharset() string {
-    return strings.Join(r.Header["Accept-Charset"], " ");
+func (self *Gok) ServerHttpAcceptCharset() string {
+    return strings.Join(self.r.Header["Accept-Charset"], " ");
 }
-func (gok *Gok) ServerHttpAcceptLanguage() string {
-    return strings.Join(r.Header["Accept-Language"], " ");
+func (self *Gok) ServerHttpAcceptLanguage() string {
+    return strings.Join(self.r.Header["Accept-Language"], " ");
 }
-func (gok *Gok) ServerHttpConnection() string {
-    return r.Header["Connection"];
+func (self *Gok) ServerHttpConnection() string {
+    return self.r.Header["Connection"];
 }
-func (gok *Gok) ServerHttpHost() string {
-    return r.Header["Host"];
+func (self *Gok) ServerHttpHost() string {
+    return self.r.Header["Host"];
 }
 
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_GET && $_POST <<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 
-func (gok *Gok) Post(name string) []byte {
+func (self *Gok) Post(name string) []byte {
     return nil;
 }
-func (gok *Gok) Get(name string) string {
+func (self *Gok) Get(name string) string {
     return "";
 }
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  $_COOKIE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
-func (gok *Gok) Cookie(name string) string {
+func (self *Gok) Cookie(name string) string {
     return "";
 }
-func (gok *Gok) SetCookie(name string, value string, expires *time.Time) {
+func (self *Gok) SetCookie(name string, value string, expires *time.Time) {
 }
-func (gok *Gok) SetCookie_4(name string, value string, expires *time.Time, path string){
+func (self *Gok) SetCookie_4(name string, value string, expires *time.Time, path string){
 }
-func (gok *Gok) SetCookie_5(name string, value string, expires *time.Time, path string,
+func (self *Gok) SetCookie_5(name string, value string, expires *time.Time, path string,
                             domain string){
 }
-func (gok *Gok) SetCookie_7(name string, value string, expires *time.Time, path string,
+func (self *Gok) SetCookie_7(name string, value string, expires *time.Time, path string,
                             domain string, secure bool, httpOnly bool) {
 }
-func (gok *Gok) UnSetCookie(name string) {
+func (self *Gok) UnSetCookie(name string) {
 }
 
 /*- $_FILE -*/
-func (gok *Gok) File(string) (string, uint32) { return "", 0; }
+func (self *Gok) File(string) (string, uint32) { return "", 0; }
 
 /*- Headers -*/
-func (gok *Gok) RequestHeader() map[string]string { return nil; }
-func (gok *Gok) ResponseHeader() map[string]string { return nil; }
+func (self *Gok) RequestHeader() map[string]string { return nil; }
+func (self *Gok) ResponseHeader() map[string]string { return nil; }
 
 /*- Request/Writer -*/
-func (gok *Gok) RequestWriter() http.ResponseWriter { return w; }
-func (gok *Gok) HttpRequest() *http.Request { return r; }
+func (self *Gok) RequestWriter() http.ResponseWriter { return w; }
+func (self *Gok) HttpRequest() *http.Request { return r; }
