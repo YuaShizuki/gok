@@ -3,6 +3,9 @@ import "fmt"
 import "net/http"
 import "time"
 import "strings"
+import "os"
+import "io"
+import "io/ioutil"
 
 type Gok struct {
     w http.ResponseWriter;
@@ -17,10 +20,10 @@ func (self *Gok) ServerSelf() string {
     return self.r.URL.Path;
 }
 func (self *Gok) ServerHttpUserAgent() string {
-    return strings.Join(self.r.Header["User-Agent"], " ");
+    return strings.Join(self.r.Header["User-Agent"], "\n");
 }
 func (self *Gok) ServerHttpReferer() string {
-    return strings.Join(self.r.Header["Referer"], " ");
+    return strings.Join(self.r.Header["Referer"], "\n");
 }
 
 func (self *Gok) ServerHttps() bool {
@@ -36,7 +39,7 @@ func (self *Gok) ServerPort() int {
     return 80;
 }
 func (self *Gok) ServerHttpAcceptEncoding() string {
-    return strings.Join(self.r.Header["Accept-Encoding"], " ");
+    return strings.Join(self.r.Header["Accept-Encoding"], "\n");
 }
 func (self *Gok) ServerProtocol() string {
     return self.r.Proto;
@@ -48,19 +51,19 @@ func (self *Gok) ServerQueryString() string {
     return self.r.URL.RawQuery
 }
 func (self *Gok) ServerHttpAccept() string {
-    return strings.Join(self.r.Header["Accept"], " ");
+    return strings.Join(self.r.Header["Accept"], "\n");
 }
 func (self *Gok) ServerHttpAcceptCharset() string {
-    return strings.Join(self.r.Header["Accept-Charset"], " ");
+    return strings.Join(self.r.Header["Accept-Charset"], "\n");
 }
 func (self *Gok) ServerHttpAcceptLanguage() string {
-    return strings.Join(self.r.Header["Accept-Language"], " ");
+    return strings.Join(self.r.Header["Accept-Language"], "\n");
 }
 func (self *Gok) ServerHttpConnection() string {
-    return strings.Join(self.r.Header["Connection"], " ");
+    return strings.Join(self.r.Header["Connection"], "\n");
 }
 func (self *Gok) ServerHttpHost() string {
-    return strings.Join(self.r.Header["Host"], " ");
+    return self.r.Host;
 }
 
 
@@ -91,7 +94,38 @@ func (self *Gok) UnSetCookie(name string) {
 }
 
 /*- $_FILE -*/
-func (self *Gok) File(string) (string, uint32) { return "", 0; }
+func (self *Gok) File(name string) (string, string, string, uint32) {
+    f, fHeader, err := self.r.FormFile(name);
+    if err != nil {
+        return "", "", "", 0;
+    }
+    defer f.Close();
+    size := uint32(0);
+    download, err := os.OpenFile("./gokDwnload", os.O_RDWR, 0644);
+    if err != nil {
+        return "", "", "", 0;
+    }
+    defer os.Close(download);
+    buff := make([]byte, 512);
+    for {
+        n, err := f.Read(buff);
+        if (n == 0) || (err == io.EOF) {
+            break;
+        }
+        if err != nil {
+            return "", "", "", 0
+        }
+        n2, err := os.Write(download, buff);
+        if err != nil {
+            return "", "", "", 0;
+        }
+        size += n2;
+    }
+    if len(fHeader.Header["Content-Type"]) == 0 {
+        return f2, fHeader.Name, "", size;
+    }
+    return f2, fHeader.Name, fHeader.Header["Content-Type"][0], size;
+}
 
 /*- Headers -*/
 func (self *Gok) RequestHeader() map[string]string { return nil; }
