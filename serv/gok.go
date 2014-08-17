@@ -80,21 +80,69 @@ func (self *Gok) Cookie(name string) string {
     if cookie, err := self.r.Cookie(name); err == http.ErrNoCookie {
         return "";
     } else if cookie != nil {
-        return cookie.Raw;
+        return cookie.Name+"="+cookie.Value;
     }
     return "";
 }
-func (self *Gok) SetCookie(name string, value string, expires *time.Time) {
+func (self *Gok) SetCookie(name string, value string, duration int64) {
+    if (len(name) == 0) || (len(value) == 0) {
+        return;
+    }
+    cookie := new(http.Cookie);
+    cookie.Name = name;
+    cookie.Value = value;
+    if duration != 0 {
+        cookie.Expires = time.Now().Add(duration * time.Second);
+    }
+    http.SetCookie(w, cookie);
 }
-func (self *Gok) SetCookie_4(name string, value string, expires *time.Time, path string){
+
+func (self *Gok) SetCookie_4(name string, value string, duration int64,
+                                urlPath string){
+    if (len(name) == 0) || (len(value) == 0) {
+        return;
+    }
+    cookie := new(http.Cookie);
+    cookie.Name = name;
+    cookie.Value = value;
+    if duration != 0 {
+        cookie.Expires = time.Now().Add(duration * time.Second);
+    }
+    if len(urlPath) {
+        cookie.Path = urlPath;
+    }
+    http.SetCookie(w, cookie);
 }
-func (self *Gok) SetCookie_5(name string, value string, expires *time.Time, path string,
-                            domain string){
+func (self *Gok) SetCookie_5(name string, value string, duration int64,
+                                urlPath string, domain string) {
+    if (len(name) == 0) || (len(value) == 0) {
+        return;
+    }
+    cookie := new(http.Cookie);
+    cookie.Name = name;
+    cookie.Value = value;
+    if duration != 0 {
+        cookie.Expires = time.Now().Add(duration * time.Second);
+    }
+    if len(urlPath) {
+        cookie.Path = urlPath;
+    }
+    if len(domain) {
+        cookie.Domain = domain;
+    }
+    http.SetCookie(w, cookie);
 }
-func (self *Gok) SetCookie_7(name string, value string, expires *time.Time, path string,
+func (self *Gok) SetCookie_7(name string, value string, duration int64, path string,
                             domain string, secure bool, httpOnly bool) {
-}
-func (self *Gok) UnSetCookie(name string) {
+    if (len(name) == 0) || (len(value) == 0) {
+        return;
+    }
+    cookie := new(http.Cookie);
+    cookie.Name = name;
+    cookie.Value = value;
+    if duration != 0 {
+        cookie.Expires = time.Now().Add(duration * time.Second)
+    }
 }
 
 /*- $_FILE -*/
