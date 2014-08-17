@@ -41,7 +41,6 @@ func clearCookie(w http.ResponseWriter, r *http.Request) {
     if cookie, err := r.Cookie("saltRocket"); err == http.ErrNoCookie {
         fmt.Println("No cookie present")
     } else if cookie != nil {
-        fmt.Println("=> deleting cookie");
         cookie.Expires = time.Now().Add(-(300 * 60 * time.Minute));
         cookie.RawExpires = "";
         http.SetCookie(w, cookie);

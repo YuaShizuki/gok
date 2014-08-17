@@ -77,6 +77,11 @@ func (self *Gok) Get(name string) string {
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  $_COOKIE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 func (self *Gok) Cookie(name string) string {
+    if cookie, err := self.r.Cookie(name); err == http.ErrNoCookie {
+        return "";
+    } else if cookie != nil {
+        return cookie.Raw;
+    }
     return "";
 }
 func (self *Gok) SetCookie(name string, value string, expires *time.Time) {
