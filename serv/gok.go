@@ -1,19 +1,37 @@
 package main
 import "fmt"
 import "net/http"
+import "net/url"
 import "time"
 import "strings"
 import "os"
 import "io"
+import "bytes"
 
 type Gok struct {
     w http.ResponseWriter;
     r *http.Request;
+    getValues url.Values;
+    response *bytes.Buffer;
+    should_redirect bool;
 };
 
 func (self *Gok) Echo(a ...interface{}) {
-    fmt.Fprint(self.w, a...);
+    if response = nil {
+        self.response = new(bytes.Buffer);
+    }
+    fmt.Fprint(self.response, a...);
 }
+
+func (self *Gok) Redirect(newUrl string) {
+    self.should_redirect = true;
+    self.Header("Location:"+url);
+}
+
+func (self *Gok) Die() {
+    self.response = nil;
+}
+
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_SERVER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 func (self *Gok) ServerSelf() string {
     return self.r.URL.Path;
@@ -22,7 +40,7 @@ func (self *Gok) ServerHttpUserAgent() string {
     return strings.Join(self.r.Header["User-Agent"], "\n");
 }
 func (self *Gok) ServerHttpReferer() string {
-    return strings.Join(self.r.Header["Referer"], "\n");
+    self.r.Referer();
 }
 
 func (self *Gok) ServerHttps() bool {
@@ -69,10 +87,17 @@ func (self *Gok) ServerHttpHost() string {
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_GET && $_POST <<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 
 func (self *Gok) Post(name string) []byte {
-    return nil;
+    return self.r.PostFormValue(name);
 }
 func (self *Gok) Get(name string) string {
-    return "";
+    if self.getValues == nil {
+        self.getValues, err = url.ParseQuery(r.URL.Query);
+        if err == nil {
+            self.getValues = nil;
+            return "";
+        }
+    }
+    return self.getValues.Get(name);
 }
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  $_COOKIE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
@@ -80,7 +105,7 @@ func (self *Gok) Cookie(name string) string {
     if cookie, err := self.r.Cookie(name); err == http.ErrNoCookie {
         return "";
     } else if cookie != nil {
-        return cookie.Name+"="+cookie.Value;
+        return cookie.Value;
     }
     return "";
 }
@@ -132,8 +157,9 @@ func (self *Gok) SetCookie_5(name string, value string, duration int64,
     }
     http.SetCookie(w, cookie);
 }
-func (self *Gok) SetCookie_7(name string, value string, duration int64, path string,
-                            domain string, secure bool, httpOnly bool) {
+func (self *Gok) SetCookie_7(name string, value string, duration int64,
+                                urlPath string, domain string, secure bool,
+                                httpOnly bool) {
     if (len(name) == 0) || (len(value) == 0) {
         return;
     }
@@ -146,6 +172,12 @@ func (self *Gok) SetCookie_7(name string, value string, duration int64, path str
     if len(urlPath) {
         cookie.Path = urlPath;
     }
+    if len(domain) {
+        cookie.Domain = domain;
+    }
+    cookie.Secure = secure;
+    cookie.HttpOnly = httpOnly;
+    http.SetCookie(w, cookie);
 }
 
 /*- $_FILE -*/
@@ -180,10 +212,10 @@ func (self *Gok) Header(header string) {
     self.w.Header().Add(h[0], h[1]);
 }
 
-func (self *Gok) RequestHeader() map[string][]string {
+func (self *Gok) RequestHeader() http.Header {
     return self.r.Header;
 }
-func (self *Gok) ResponseHeader() map[string][]string {
+func (self *Gok) ResponseHeader() http.Header {
     return self.w.Header();
 }
 
