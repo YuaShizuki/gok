@@ -24,7 +24,29 @@ func index(w http.ResponseWriter, r *http.Request) {
     </body>
 </html>
 `;
+    if _, err := r.Cookie("saltRocket"); err == http.ErrNoCookie {
+        fmt.Println("No Cookies Recived");
+        cookie := &http.Cookie{
+                        Name:"saltRocket",
+                        Value:"fossdark",
+                    };
+        http.SetCookie(w, cookie);
+    } else {
+        fmt.Println("=> recived cookie");
+    }
     fmt.Fprintln(w, html);
+}
+
+func clearCookie(w http.ResponseWriter, r *http.Request) {
+    if cookie, err := r.Cookie("saltRocket"); err == http.ErrNoCookie {
+        fmt.Println("No cookie present")
+    } else if cookie != nil {
+        fmt.Println("=> deleting cookie");
+        cookie.Expires = time.Now().Add(-(300 * 60 * time.Minute));
+        cookie.RawExpires = "";
+        http.SetCookie(w, cookie);
+    }
+    fmt.Fprintln(w, "<html><h1>fuck me!.</h1></html>")
 }
 
 func genRandName() string {
@@ -58,6 +80,8 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
        index(w, r);
    } else if r.URL.Path == "/postit" {
        postit(w, r);
+   } else if r.URL.Path == "/clearcookie" {
+        clearCookie(w, r);
    }
 }
 

@@ -116,9 +116,21 @@ func (self *Gok) File(name string) (string, string, string, int64) {
 }
 
 /*- Headers -*/
-func (self *Gok) RequestHeader() map[string]string { return nil; }
-func (self *Gok) ResponseHeader() map[string]string { return nil; }
+func (self *Gok) Header(header string) {
+    h := strings.Split(header, ":");
+    if len(h) != 2 {
+        panic("unknown header value");
+    }
+    self.w.Header().Add(h[0], h[1]);
+}
 
-/*- Request/Writer -*/
-func (self *Gok) RequestWriter() http.ResponseWriter { return self.w; }
+func (self *Gok) RequestHeader() map[string][]string {
+    return self.r.Header;
+}
+func (self *Gok) ResponseHeader() map[string][]string {
+    return self.w.Header();
+}
+
+/*- Request | Writer -*/
+func (self *Gok) ResponseWriter() http.ResponseWriter { return self.w; }
 func (self *Gok) HttpRequest() *http.Request { return self.r; }
