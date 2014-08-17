@@ -17,7 +17,7 @@ type Gok struct {
 };
 
 func (self *Gok) Echo(a ...interface{}) {
-    if response = nil {
+    if self.response == nil {
         self.response = new(bytes.Buffer);
     }
     fmt.Fprint(self.response, a...);
@@ -25,7 +25,7 @@ func (self *Gok) Echo(a ...interface{}) {
 
 func (self *Gok) Redirect(newUrl string) {
     self.should_redirect = true;
-    self.Header("Location:"+url);
+    self.Header("Location:"+newUrl);
 }
 
 func (self *Gok) Die() {
@@ -40,7 +40,7 @@ func (self *Gok) ServerHttpUserAgent() string {
     return strings.Join(self.r.Header["User-Agent"], "\n");
 }
 func (self *Gok) ServerHttpReferer() string {
-    self.r.Referer();
+    return self.r.Referer();
 }
 
 func (self *Gok) ServerHttps() bool {
@@ -86,16 +86,12 @@ func (self *Gok) ServerHttpHost() string {
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_GET && $_POST <<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 
-func (self *Gok) Post(name string) []byte {
+func (self *Gok) Post(name string) string {
     return self.r.PostFormValue(name);
 }
 func (self *Gok) Get(name string) string {
     if self.getValues == nil {
-        self.getValues, err = url.ParseQuery(r.URL.Query);
-        if err == nil {
-            self.getValues = nil;
-            return "";
-        }
+        self.getValues = self.r.URL.Query();
     }
     return self.getValues.Get(name);
 }
@@ -117,9 +113,9 @@ func (self *Gok) SetCookie(name string, value string, duration int64) {
     cookie.Name = name;
     cookie.Value = value;
     if duration != 0 {
-        cookie.Expires = time.Now().Add(duration * time.Second);
+        cookie.Expires = time.Now().Add(time.Duration(duration) * time.Second);
     }
-    http.SetCookie(w, cookie);
+    http.SetCookie(self.w, cookie);
 }
 
 func (self *Gok) SetCookie_4(name string, value string, duration int64,
@@ -131,12 +127,12 @@ func (self *Gok) SetCookie_4(name string, value string, duration int64,
     cookie.Name = name;
     cookie.Value = value;
     if duration != 0 {
-        cookie.Expires = time.Now().Add(duration * time.Second);
+        cookie.Expires = time.Now().Add(time.Duration(duration) * time.Second);
     }
-    if len(urlPath) {
+    if len(urlPath) != 0{
         cookie.Path = urlPath;
     }
-    http.SetCookie(w, cookie);
+    http.SetCookie(self.w, cookie);
 }
 func (self *Gok) SetCookie_5(name string, value string, duration int64,
                                 urlPath string, domain string) {
@@ -147,15 +143,15 @@ func (self *Gok) SetCookie_5(name string, value string, duration int64,
     cookie.Name = name;
     cookie.Value = value;
     if duration != 0 {
-        cookie.Expires = time.Now().Add(duration * time.Second);
+        cookie.Expires = time.Now().Add(time.Duration(duration) * time.Second);
     }
-    if len(urlPath) {
+    if len(urlPath) != 0 {
         cookie.Path = urlPath;
     }
-    if len(domain) {
+    if len(domain) != 0 {
         cookie.Domain = domain;
     }
-    http.SetCookie(w, cookie);
+    http.SetCookie(self.w, cookie);
 }
 func (self *Gok) SetCookie_7(name string, value string, duration int64,
                                 urlPath string, domain string, secure bool,
@@ -167,17 +163,17 @@ func (self *Gok) SetCookie_7(name string, value string, duration int64,
     cookie.Name = name;
     cookie.Value = value;
     if duration != 0 {
-        cookie.Expires = time.Now().Add(duration * time.Second)
+        cookie.Expires = time.Now().Add(time.Duration(duration) * time.Second)
     }
-    if len(urlPath) {
+    if len(urlPath) != 0 {
         cookie.Path = urlPath;
     }
-    if len(domain) {
+    if len(domain) != 0{
         cookie.Domain = domain;
     }
     cookie.Secure = secure;
     cookie.HttpOnly = httpOnly;
-    http.SetCookie(w, cookie);
+    http.SetCookie(self.w, cookie);
 }
 
 /*- $_FILE -*/
@@ -219,6 +215,6 @@ func (self *Gok) ResponseHeader() http.Header {
     return self.w.Header();
 }
 
-/*- Request | Writer -*/
+/*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>> Request | Writer <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 func (self *Gok) ResponseWriter() http.ResponseWriter { return self.w; }
 func (self *Gok) HttpRequest() *http.Request { return self.r; }

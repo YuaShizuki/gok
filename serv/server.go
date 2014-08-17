@@ -26,11 +26,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 `;
     if _, err := r.Cookie("saltRocket"); err == http.ErrNoCookie {
         fmt.Println("No Cookies Recived");
-        cookie := &http.Cookie{
+        /*cookie := &http.Cookie{
                         Name:"saltRocket",
                         Value:"fossdark",
-                    };
-
+                    };*/
         fmt.Println("=> recived cookie");
     }
     fmt.Fprintln(w, html);
