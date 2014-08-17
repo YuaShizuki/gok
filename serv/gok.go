@@ -143,6 +143,9 @@ func (self *Gok) SetCookie_7(name string, value string, duration int64, path str
     if duration != 0 {
         cookie.Expires = time.Now().Add(duration * time.Second)
     }
+    if len(urlPath) {
+        cookie.Path = urlPath;
+    }
 }
 
 /*- $_FILE -*/

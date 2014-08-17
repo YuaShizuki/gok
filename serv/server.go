@@ -30,8 +30,7 @@ func index(w http.ResponseWriter, r *http.Request) {
                         Name:"saltRocket",
                         Value:"fossdark",
                     };
-        http.SetCookie(w, cookie);
-    } else {
+
         fmt.Println("=> recived cookie");
     }
     fmt.Fprintln(w, html);
