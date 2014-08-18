@@ -37,7 +37,7 @@ func (self *Gok) ServerSelf() string {
     return self.r.URL.Path;
 }
 func (self *Gok) ServerHttpUserAgent() string {
-    return strings.Join(self.r.Header["User-Agent"], "\n");
+    return self.r.Header.Get("User-Agent");
 }
 func (self *Gok) ServerHttpReferer() string {
     return self.r.Referer();
@@ -56,7 +56,7 @@ func (self *Gok) ServerPort() int {
     return 80;
 }
 func (self *Gok) ServerHttpAcceptEncoding() string {
-    return strings.Join(self.r.Header["Accept-Encoding"], "\n");
+    return self.r.Header.Get("Accept-Encoding");
 }
 func (self *Gok) ServerProtocol() string {
     return self.r.Proto;
@@ -68,16 +68,16 @@ func (self *Gok) ServerQueryString() string {
     return self.r.URL.RawQuery
 }
 func (self *Gok) ServerHttpAccept() string {
-    return strings.Join(self.r.Header["Accept"], "\n");
+    return self.r.Header.Get("Accept");
 }
 func (self *Gok) ServerHttpAcceptCharset() string {
-    return strings.Join(self.r.Header["Accept-Charset"], "\n");
+    return self.r.Header.Get("Accept-Charset");
 }
 func (self *Gok) ServerHttpAcceptLanguage() string {
-    return strings.Join(self.r.Header["Accept-Language"], "\n");
+    return self.r.Header.Get("Accept-Language");
 }
 func (self *Gok) ServerHttpConnection() string {
-    return strings.Join(self.r.Header["Connection"], "\n");
+    return self.r.Header.Get("Connection");
 }
 func (self *Gok) ServerHttpHost() string {
     return self.r.Host;
@@ -105,6 +105,7 @@ func (self *Gok) Cookie(name string) string {
     }
     return "";
 }
+
 func (self *Gok) SetCookie(name string, value string, duration int64) {
     if (len(name) == 0) || (len(value) == 0) {
         return;
@@ -176,7 +177,7 @@ func (self *Gok) SetCookie_7(name string, value string, duration int64,
     http.SetCookie(self.w, cookie);
 }
 
-/*- $_FILE -*/
+/*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_FILE <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 func (self *Gok) File(name string) (string, string, string, int64) {
     f, fHeader, err := self.r.FormFile(name);
     if err != nil {
@@ -205,7 +206,7 @@ func (self *Gok) Header(header string) {
     if len(h) != 2 {
         panic("unknown header value");
     }
-    self.w.Header().Add(h[0], h[1]);
+    self.w.Header().Set(h[0], h[1]);
 }
 
 func (self *Gok) RequestHeader() http.Header {
