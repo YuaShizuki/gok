@@ -6,11 +6,19 @@ import "net/http"
 var routes map[string]func(*Gok) = map[string]func(*Gok) {
 //<gok routers>
     "/":index,
+    "/submit":submit,
 //</gok>
 };
 
 func index(gok *Gok) {
-    gok.Echo("<html>");
+    html := `
+<html>
+    <form action="/submit" method="post">
+        First name: <input type="text" name="firstname"><br>
+        <input type="submit" name="submit" value="Submit">
+    </form> 
+`;
+    gok.Echo(html);
     gok.Echo("ServerSelf: ", gok.ServerSelf(),"</br>");
     gok.Echo("ServerHttpUserAgent: ", gok.ServerHttpUserAgent(),"</br>");
     gok.Echo("SeverHttps: ", gok.ServerHttps(), "</br>");
@@ -30,7 +38,7 @@ func index(gok *Gok) {
 }
 
 func submit(gok *Gok) {
-    gok.Echo(gok.File("content"));
+    gok.Echo(gok.Post("firstname"));
 }
 
 type mainHandler struct{};
