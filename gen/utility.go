@@ -6,7 +6,7 @@ import "math/rand"
 import "time"
 
 
-pathExist(path string) (bool, os.FileInfo) {
+func pathExist(path string) (bool, os.FileInfo) {
     info, err :=  os.Stat(path);
     if err != nil {
         if os.IsNotExist(err) {
