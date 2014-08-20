@@ -5,8 +5,7 @@ import "net/http"
 
 var routes map[string]func(*Gok) = map[string]func(*Gok) {
 //<gok routers>
-    "/":index,
-    "/submit":submit,
+    "/":Render96ced45a,
 //</gok>
 };
 

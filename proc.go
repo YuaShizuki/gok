@@ -82,6 +82,7 @@ func buildGoCode(code string) (string, error) {
 
 func strToCStr(str string) string {
     result := strings.Replace(str, "\n", "\\n", -1);
+    //result = strings.Replace(str, "\"", "\\\"", -1);
     result = strings.Replace(result, "\t", "\\t", -1);
     result = strings.Replace(result, "\r", "\\r", -1);
     result = strings.Replace(result, "\v", "\\v", -1);
