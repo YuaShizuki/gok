@@ -1,11 +1,22 @@
-<?go-imports 
+<?go-imports
+    package main 
     import "fmt"
 ?> 
 <html>
-    <body>
-        <?go for i := 0; i < 100; i++ { ?>
-            <p>Hello World!</p>
-        <?go } ?>
+    <head>
+        <script>
+            function Write() { 
+                body = document.getElementsByTagName("body");
+                body[0].innerHTML += "<p>Complete!</p>";
+            }
+        </script>
+    </head>
+    <body onload="Write()">
+        <p>
+            <?go for i := 0; i < 10; i++ {
+                gok.Echo(i,"<=>");    
+            } ?>
+        </p>
     </body>
 </html>
-<?go fmt.Println("responded to request => /test1") ?>
+<?go fmt.Println("responded to request =>"+gok.ServerSelf()) ?>

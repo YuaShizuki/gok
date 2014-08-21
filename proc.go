@@ -3,7 +3,7 @@ import "fmt"
 import "strings"
 import "errors"
 
-func processGok(code string) (string, string, error) {
+func processGokFile(code string) (string, string, error) {
     var gofile string = "%s\nfunc %s(gok *Gok){\n%s\n}";
     funcName := fmt.Sprintf("Render%s", genRandName());
     imports, r, err := buildImports(code);
@@ -87,5 +87,6 @@ func strToCStr(str string) string {
     result = strings.Replace(result, "\r", "\\r", -1);
     result = strings.Replace(result, "\v", "\\v", -1);
     result = strings.Replace(result, "\f", "\\f", -1);
+    result = strings.Replace(result, "\"", "\\\"", -1);
     return result;
 }

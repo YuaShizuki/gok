@@ -8,14 +8,14 @@ var (
 );
 
 func main() {
-    files,_:= filepath.Glob("./*."+fileExtension);
+    files,_:= filepathd.Glob("./*."+fileExtension);
     funcNames := make([]string, len(files));
     for _,v := range files {
         content, err := ioutil.ReadFile(v);
         if err != nil {
             errExit(err, "");
         }
-        goCode,_,err := processGok(string(content));
+        goCode, fnName, err := processGok(string(content));
         if err != nil {
             errExit(err, "");
         }
