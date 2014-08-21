@@ -2,6 +2,19 @@ package main
 import "time"
 import "math/rand"
 import "encoding/hex"
+import "os"
+
+func pathExist(path string) (bool, os.FileInfo) {
+    info, err :=  os.Stat(path);
+    if err != nil {
+        if os.IsNotExist(err) {
+            return false, info;
+        }
+        panic("panic-> cannot determine if path exists");
+    }
+    return true, info;
+}
+
 
 func genRandName() string {
     rand.Seed(time.Now().UnixNano());

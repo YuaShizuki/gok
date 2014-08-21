@@ -4,8 +4,7 @@ import "net/http"
 import "io/ioutil"
 
 var routes map[string]func(*Gok) = map[string]func(*Gok) {
-//<gok routes>
-//</gok>
+//<gok inject routes>
 };
 
 type mainHandler struct{};
@@ -18,6 +17,10 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         fn(gok);
         fmt.Fprint(w, gok.response);
     } else {
+        if exist,_ := pathExist(gok.ServerSelf()); exist {
+            http.ServeFile(w, r, gok.ServerSelf());
+            return
+        }
         w.WriteHeader(404);
         content404, err := ioutil.ReadFile("404.html");
         if err != nil {

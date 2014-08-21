@@ -34,7 +34,7 @@ func (self *Gok) Die() {
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_SERVER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
 func (self *Gok) ServerSelf() string {
-    return self.r.URL.Path;
+    return self.r.URL.Path[1:];
 }
 func (self *Gok) ServerHttpUserAgent() string {
     return self.r.Header.Get("User-Agent");
