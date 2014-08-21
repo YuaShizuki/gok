@@ -3,7 +3,7 @@ import "fmt"
 import "strings"
 import "errors"
 
-func processGokFile(code string) (string, string, error) {
+func processGokContent(code string) (string, string, error) {
     var gofile string = "%s\nfunc %s(gok *Gok){\n%s\n}";
     funcName := fmt.Sprintf("Render%s", genRandName());
     imports, r, err := buildImports(code);
