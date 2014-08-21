@@ -4,7 +4,7 @@ import "strings"
 import "errors"
 
 func processGokContent(code string) (string, string, error) {
-    var gofile string = "%s\nfunc %s(gok *Gok){\n%s\n}";
+    var gofile string = "%s\nfunc %s(gok *Gok){%s\n}";
     funcName := fmt.Sprintf("Render%s", genRandName());
     imports, r, err := buildImports(code);
     if err != nil {
@@ -37,7 +37,7 @@ func buildImports(code string) (string, int, error) {
     for i := range imports {
         imports[i] = strings.TrimSpace(imports[i]);
     }
-    return strings.Join(imports, "\n"), (indxEnd+2), nil;
+    return "package main\n"+strings.Join(imports, "\n"), (indxEnd+2), nil;
 }
 
 func buildGoCode(code string) (string, error) {

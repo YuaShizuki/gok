@@ -3,6 +3,11 @@ import "fmt"
 import "os"
 import "io/ioutil"
 import "path/filepath"
+import "encoding/hex"
+import "compress/gzip"
+import "archivei/tar"
+import "strings"
+import "bytes"
 
 var (
     fileExtension = "gok"
@@ -19,6 +24,8 @@ func main() {
     for k,v := range createdFiles {
         fmt.Println(k,":",v);
     }
+    unpackResource();
+    injectRoutes();
 }
 
 func convertGokToGoFiles(dir string) {
@@ -47,3 +54,40 @@ func convertGokToGoFiles(dir string) {
     }
 }
 
+func unpackResource() {
+    orignal := hex.DecodeString(Resource);
+    if err != nil {
+        errExit(err, "");
+    }
+    unzip, err := gzip.NewReader(bytes.NewBuffer([]byte(orignal)))
+    if err != nil {
+        errExit(err);
+    }
+    untar := tar.NewReader(unzip);
+    var fileContent bytes.Buffer;
+    for h, err := untar.Next(); err == nil;  h, err = untar.Next() {
+        fileContent.Reset();
+        io.Copy(&fileContent, untar);
+        var name string;
+        if h[0] == '/' {
+            name = h.Name[1:];
+        } else {
+            name = h.Name;
+        }
+        if strings.Contains(name, "/") {
+            lstIndex := strings.LastIndex(name, "/");
+            if err := os.MkdirAll(name[0:lstIndx], 0744); err != nil {
+                errExit(err);
+            }
+        }
+        ioutil.WriteFile(name, fileContent.Bytes(), os.FileMode(h.Mode));
+    }
+}
+
+func injectRoutes() {
+    s, err := ioutil.ReadFile("serverb596f256.go");
+    if err != nil {
+        errExit(err);
+    }
+    part1 := strings.Split(string(s), "//<gok routes>\n");
+}
