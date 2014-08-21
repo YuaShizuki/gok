@@ -1,26 +1,49 @@
 package main
 import "fmt"
+import "os"
 import "io/ioutil"
 import "path/filepath"
 
 var (
     fileExtension = "gok"
+    createdFiles map[string]string;
 );
 
 func main() {
-    files,_:= filepathd.Glob("./*."+fileExtension);
-    funcNames := make([]string, len(files));
-    for _,v := range files {
-        content, err := ioutil.ReadFile(v);
-        if err != nil {
-            errExit(err, "");
-        }
-        goCode, fnName, err := processGok(string(content));
-        if err != nil {
-            errExit(err, "");
-        }
-        fmt.Println(goCode);
-        ioutil.WriteFile(v+".go", []byte(goCode), 0644)
+    //TODO remove this after stabilization. 
+    if len(os.Args) == 2 {
+        os.Chdir(os.Args[1]);
     }
-    fmt.Println(funcNames)
+    createdFiles = make(map[string]string);
+    convertGokToGoFiles(".");
+    for k,v := range createdFiles {
+        fmt.Println(k,":",v);
+    }
 }
+
+func convertGokToGoFiles(dir string) {
+    files, err := filepath.Glob(dir+"/*.gok");
+    if err != nil {
+        errExit(err, "");
+    }
+    for _, s := range files {
+        gokContent, err := ioutil.ReadFile(s);
+        if err != nil {
+            errExit(err, "");
+        }
+        gocode, mainFunc, err := processGokContent(string(gokContent));
+        if err != nil {
+            errExit(err, "");
+        }
+        createdFiles[s] = mainFunc;
+        ioutil.WriteFile(s+".go", []byte(gocode), 0644);
+    }
+    if dirs, err := ioutil.ReadDir(dir); err == nil {
+        for _, d := range dirs {
+            if d.IsDir() {
+                convertGokToGoFiles(dir+"/"+d.Name());
+            }
+        }
+    }
+}
+
