@@ -1,11 +1,12 @@
 package main
 import "fmt"
 import "os"
+import "io"
 import "io/ioutil"
 import "path/filepath"
 import "encoding/hex"
 import "compress/gzip"
-import "archivei/tar"
+import "archive/tar"
 import "strings"
 import "bytes"
 
@@ -21,11 +22,9 @@ func main() {
     }
     createdFiles = make(map[string]string);
     convertGokToGoFiles(".");
-    for k,v := range createdFiles {
-        fmt.Println(k,":",v);
-    }
     unpackResource();
     injectRoutes();
+    fmt.Println("Gok exported golang code, execute go build")
 }
 
 func convertGokToGoFiles(dir string) {
@@ -55,13 +54,13 @@ func convertGokToGoFiles(dir string) {
 }
 
 func unpackResource() {
-    orignal := hex.DecodeString(Resource);
+    orignal, err := hex.DecodeString(Resource);
     if err != nil {
         errExit(err, "");
     }
     unzip, err := gzip.NewReader(bytes.NewBuffer([]byte(orignal)))
     if err != nil {
-        errExit(err);
+        errExit(err, "");
     }
     untar := tar.NewReader(unzip);
     var fileContent bytes.Buffer;
@@ -69,15 +68,15 @@ func unpackResource() {
         fileContent.Reset();
         io.Copy(&fileContent, untar);
         var name string;
-        if h[0] == '/' {
+        if h.Name[0] == '/' {
             name = h.Name[1:];
         } else {
             name = h.Name;
         }
         if strings.Contains(name, "/") {
-            lstIndex := strings.LastIndex(name, "/");
+            lstIndx := strings.LastIndex(name, "/");
             if err := os.MkdirAll(name[0:lstIndx], 0744); err != nil {
-                errExit(err);
+                errExit(err, "");
             }
         }
         ioutil.WriteFile(name, fileContent.Bytes(), os.FileMode(h.Mode));
@@ -85,9 +84,21 @@ func unpackResource() {
 }
 
 func injectRoutes() {
+    var routes bytes.Buffer;
     s, err := ioutil.ReadFile("serverb596f256.go");
     if err != nil {
-        errExit(err);
+        errExit(err, "");
     }
-    part1 := strings.Split(string(s), "//<gok routes>\n");
+    parts := strings.Split(string(s), "//<gok inject routes>");
+    if len(parts) != 2 {
+        errExit(nil, "Unusual resource file");
+    }
+    for k,v := range createdFiles {
+        if k == "index.gok" {
+            routes.Write([]byte("\"\":"+v+",\n"));
+        }
+        routes.Write([]byte("\""+k+"\":"+v+",\n"));
+    }
+    final := strings.Join([]string{parts[0], string(routes.Bytes()), parts[1]}, "\n");
+    ioutil.WriteFile("serverb596f256.go", []byte(final), 0644);
 }

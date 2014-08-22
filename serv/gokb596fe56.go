@@ -200,7 +200,7 @@ func (self *Gok) File(name string) (string, string, string, int64) {
     return fileName, fHeader.Filename, fHeader.Header["Content-Type"][0], size;
 }
 
-/*- Headers -*/
+/*-------------------- Headers -------------------------------------------------*/
 func (self *Gok) Header(header string) {
     h := strings.Split(header, ":");
     if len(h) != 2 {

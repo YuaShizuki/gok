@@ -7,10 +7,7 @@ import "os"
 func pathExist(path string) (bool, os.FileInfo) {
     info, err :=  os.Stat(path);
     if err != nil {
-        if os.IsNotExist(err) {
-            return false, info;
-        }
-        panic("panic-> cannot determine if path exists");
+        return false, info;
     }
     return true, info;
 }
