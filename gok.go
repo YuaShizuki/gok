@@ -9,10 +9,14 @@ import "compress/gzip"
 import "archive/tar"
 import "strings"
 import "bytes"
+import "os/exec"
+import "container/list"
+
 
 var (
     fileExtension = "gok"
-    createdFiles map[string]string;
+    webRoutes map[string]string;
+    shouldDelete *list.List;
 );
 
 func main() {
@@ -20,11 +24,14 @@ func main() {
     if len(os.Args) == 2 {
         os.Chdir(os.Args[1]);
     }
-    createdFiles = make(map[string]string);
+    webRoutes = make(map[string]string);
+    shouldDelete = list.New();
     convertGokToGoFiles(".");
     unpackResource();
     injectRoutes();
-    fmt.Println("Gok exported golang code, execute go build")
+    fmt.Println("now building go code");
+    goBuild();
+    deleteBuiltFiles();
 }
 
 func convertGokToGoFiles(dir string) {
@@ -41,7 +48,8 @@ func convertGokToGoFiles(dir string) {
         if err != nil {
             errExit(err, "");
         }
-        createdFiles[s] = mainFunc;
+        webRoutes[s] = mainFunc;
+        shouldDelete.PushBack(s+".go");
         ioutil.WriteFile(s+".go", []byte(gocode), 0644);
     }
     if dirs, err := ioutil.ReadDir(dir); err == nil {
@@ -80,6 +88,9 @@ func unpackResource() {
             }
         }
         ioutil.WriteFile(name, fileContent.Bytes(), os.FileMode(h.Mode));
+        if name[len(name)-3:] == ".go" {
+            shouldDelete.PushBack(name);
+        }
     }
 }
 
@@ -93,7 +104,7 @@ func injectRoutes() {
     if len(parts) != 2 {
         errExit(nil, "Unusual resource file");
     }
-    for k,v := range createdFiles {
+    for k,v := range webRoutes {
         if k == "index.gok" {
             routes.Write([]byte("\"\":"+v+",\n"));
         }
@@ -101,4 +112,19 @@ func injectRoutes() {
     }
     final := strings.Join([]string{parts[0], string(routes.Bytes()), parts[1]}, "\n");
     ioutil.WriteFile("serverb596f256.go", []byte(final), 0644);
+}
+
+func goBuild() {
+    cmd := exec.Command("go", "build");
+    output, err := cmd.Output();
+    if err != nil {
+        errExit(err, "");
+    }
+    fmt.Println(string(output));
+}
+
+func deleteBuiltFiles() {
+    for e := shouldDelete.Front(); e != nil; e = e.Next() {
+       os.Remove(e.Value.(string));
+   }
 }
