@@ -11,7 +11,7 @@ import "strings"
 import "bytes"
 import "os/exec"
 import "container/list"
-
+import "errors"
 
 var (
     fileExtension = "gok"
@@ -192,18 +192,50 @@ func getEquivalentGokFile(file) bool {
     return gokFile;
 }
 
-func gokFileLineNum(file string, lineNum int) (int, error) {
+func gokFileLineNum(gokFile string, file string, ln int) (int, error) {
     f, err := ioutil.ReadFile(file);
     if err != nil {
         return 0, err;
     }
+    gokFileContent, err := ioutil.ReadFile(file);
+    if err != nil {
+        return 0, err;
+    }
     lines := strings.Split(string(f), "\n");
+    if len(lines) < ln {
+        return 0, errors.New("line numbers exceds existing lines");
+    }
+    duplicates := countDuplicatesTill(lines, ln);
+    orignalLn := findLnInGokFile(gokFileContent, lines[ln-1], duplicates);
+    return orignalLn, nil;
 }
 
 func countDuplicatesTill(code []string, ln int) {
-
+    initial := code[ln-1];
+    count := 0;
+    for _, c := range code {
+        if count == ln-1 {
+            return count;
+        }
+        if c == initial {
+            count++;
+        }
+    }
+    return count;
 }
 
 func findLnInGokFile(gokContent string, ln string, skipCount int) int {
-
+    last := 0;
+    for i := 0; i < (skipCount+1); i++ {
+        slice := gokContent[last:];
+        indx := strings.Index(slice, ln);
+        if indx == -1 {
+            break;
+        }
+        last += indx
+    }
+    if last == 0 {
+        return 0;
+    }
+    return strings.Count(gokContent[0:last], "\n")+1;
 }
