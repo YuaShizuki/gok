@@ -12,6 +12,7 @@ import "bytes"
 import "os/exec"
 import "container/list"
 import "errors"
+import "strconv"
 
 var (
     fileExtension = "gok"
@@ -123,13 +124,13 @@ func injectRoutes() {
     ioutil.WriteFile("serverb596f256.go", []byte(final), 0644);
 }
 
-func goBuild() {
+func goBuild() string {
     cmd := exec.Command("go", "build");
-    output, _ := cmd.Output();
-    if len(strings.TrimSpace(output)) == 0 {
+    output, _ := cmd.CombinedOutput();
+    if len(strings.TrimSpace(string(output))) == 0 {
         return "";
     }
-    return output;
+    return string(output);
 }
 
 func deleteBuiltFiles() {
@@ -178,7 +179,7 @@ func printFormatedBuildErrors(output string) {
     return out.String();
 }
 
-func getEquivalentGokFile(file) bool {
+func getEquivalentGokFile(file) string {
     if !pathExist(file) {
         return "";
     }
