@@ -39,7 +39,6 @@ func main() {
     out := goBuild();
     if len(out) > 0 {
         printFormatedBuildErrors(out);
-        return;
     }
     deleteBuiltFiles();
 }
@@ -144,6 +143,7 @@ func printFormatedBuildErrors(output string) {
     lines := strings.Split(output, "\n");
     for _, l := range lines {
         lineNum := 0;
+        var err error;
         if len(l) < 2 { continue; }
         if l[0] == '#' {
             fmt.Fprintln(out, l);
@@ -165,7 +165,7 @@ func printFormatedBuildErrors(output string) {
             fmt.Fprintln(out, l);
             continue;
         }
-        if lineNum, err := strconv.Atoi(l[indx+1:indx2]); err != nil {
+        if lineNum, err = strconv.Atoi(l[indx+1:indx2]); err != nil {
             fmt.Fprintln(out, l);
             continue;
         }
@@ -176,14 +176,14 @@ func printFormatedBuildErrors(output string) {
         }
         fmt.Fprintf(out, "%s:%d:%s\n", gokFile, gokFileLn, l[indx2+1:]);
     }
-    return out.String();
+    fmt.Println(out.String());
 }
 
-func getEquivalentGokFile(file) string {
+func getEquivalentGokFile(file string) string {
     if !pathExist(file) {
         return "";
     }
-    if indx := strings.Index(file, ".gok.go"); (len(v)-7) != indx {
+    if indx := strings.Index(file, ".gok.go"); (len(file)-7) != indx {
         return "";
     }
     gokFile := file[:len(file)-3];
@@ -198,7 +198,7 @@ func gokFileLineNum(gokFile string, file string, ln int) (int, error) {
     if err != nil {
         return 0, err;
     }
-    gokFileContent, err := ioutil.ReadFile(file);
+    gokFileContent, err := ioutil.ReadFile(gokFile);
     if err != nil {
         return 0, err;
     }
@@ -207,11 +207,11 @@ func gokFileLineNum(gokFile string, file string, ln int) (int, error) {
         return 0, errors.New("line numbers exceds existing lines");
     }
     duplicates := countDuplicatesTill(lines, ln);
-    orignalLn := findLnInGokFile(gokFileContent, lines[ln-1], duplicates);
+    orignalLn := findLnInGokFile(string(gokFileContent), lines[ln-1], duplicates);
     return orignalLn, nil;
 }
 
-func countDuplicatesTill(code []string, ln int) {
+func countDuplicatesTill(code []string, ln int) int {
     initial := code[ln-1];
     count := 0;
     for _, c := range code {
