@@ -21,7 +21,7 @@ var (
 
 func main() {
     //TODO remove this after stabilization. 
-    if len(os.Args) == 2 {
+    if len(os.Args) >= 2 {
         os.Chdir(os.Args[1]);
     }
     webRoutes = make(map[string]string);
@@ -29,8 +29,17 @@ func main() {
     convertGokToGoFiles(".");
     unpackResource();
     injectRoutes();
-    fmt.Println("now building go code");
-    goBuild();
+    fmt.Println("excuting go build");
+    if len(os.Args) >= 3 {
+        if os.Args[2] == "-testsrc" {
+            return;
+        }
+    }
+    out := goBuild();
+    if len(out) > 0 {
+        printFormatedBuildErrors(out);
+        return;
+    }
     deleteBuiltFiles();
 }
 
@@ -116,15 +125,85 @@ func injectRoutes() {
 
 func goBuild() {
     cmd := exec.Command("go", "build");
-    output, err := cmd.Output();
-    if err != nil {
-        errExit(err, "");
+    output, _ := cmd.Output();
+    if len(strings.TrimSpace(output)) == 0 {
+        return "";
     }
-    fmt.Println(string(output));
+    return output;
 }
 
 func deleteBuiltFiles() {
     for e := shouldDelete.Front(); e != nil; e = e.Next() {
        os.Remove(e.Value.(string));
    }
+}
+
+func printFormatedBuildErrors(output string) {
+    out := new(bytes.Buffer);
+    lines := strings.Split(output, "\n");
+    for _, l := range lines {
+        lineNum := 0;
+        if len(l) < 2 { continue; }
+        if l[0] == '#' {
+            fmt.Fprintln(out, l);
+            continue;
+        }
+        indx := strings.Index(l, ":");
+        if (indx == -1) || (len(l) <= (indx+1)) {
+            fmt.Fprintln(out, l);
+            continue;
+        }
+        file := l[0:indx];
+        gokFile := getEquivalentGokFile(file);
+        if gokFile  == "" {
+            fmt.Fprintln(out, l);
+            continue;
+        }
+        indx2 := strings.Index(l[indx+1:], ":")+indx+1;
+        if (indx2 == -1) || (len(l) <= (indx2 + 1)) {
+            fmt.Fprintln(out, l);
+            continue;
+        }
+        if lineNum, err := strconv.Atoi(l[indx+1:indx2]); err != nil {
+            fmt.Fprintln(out, l);
+            continue;
+        }
+        gokFileLn, err := gokFileLineNum(gokFile, file, lineNum);
+        if err != nil {
+            fmt.Fprintln(out, l);
+            continue;
+        }
+        fmt.Fprintf(out, "%s:%d:%s\n", gokFile, gokFileLn, l[indx2+1:]);
+    }
+    return out.String();
+}
+
+func getEquivalentGokFile(file) bool {
+    if !pathExist(file) {
+        return "";
+    }
+    if indx := strings.Index(file, ".gok.go"); (len(v)-7) != indx {
+        return "";
+    }
+    gokFile := file[:len(file)-3];
+    if !pathExist(gokFile) {
+        return "";
+    }
+    return gokFile;
+}
+
+func gokFileLineNum(file string, lineNum int) (int, error) {
+    f, err := ioutil.ReadFile(file);
+    if err != nil {
+        return 0, err;
+    }
+    lines := strings.Split(string(f), "\n");
+}
+
+func countDuplicatesTill(code []string, ln int) {
+
+}
+
+func findLnInGokFile(gokContent string, ln string, skipCount int) int {
+
 }
