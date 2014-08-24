@@ -25,3 +25,12 @@ func genRandName() string {
     str := []byte{byte(num), byte(num >> 8), byte(num >> 16), byte(num >> 24)}
     return hex.EncodeToString(str)
 }
+
+func printUsage() {
+    fmt.Println("#useage");
+    fmt.Println("   $gok run");
+    fmt.Println("   $gok build");
+    fmt.Println("   $gok src");
+    fmt.Println("   $gok api\n");
+    os.Exit(1);
+}

@@ -22,9 +22,8 @@ var (
 )
 
 func main() {
-    //TODO remove this after stabilization.
-    if len(os.Args) >= 2 {
-        os.Chdir(os.Args[1])
+    if len(os.Args) != 2 {
+        printUsage();
     }
     webRoutes = make(map[string]string)
     shouldDelete = list.New()
