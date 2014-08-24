@@ -5,23 +5,23 @@ import "strings"
 import "errors"
 
 func processGokContent(code string) (string, string, error) {
-	var gofile string = "%s\nfunc %s(gok *Gok){%s\n}"
-	funcName := fmt.Sprintf("Render%s", genRandName())
-	imports, r, err := buildImports(code)
-	if err != nil {
-		return "", "", err
-	}
-	goCode, err := buildGoCode(code[r:])
-	if err != nil {
-		return "", "", err
-	}
-	final := fmt.Sprintf(gofile, imports, funcName, goCode)
-	return final, funcName, nil
+    var gofile string = "%s\nfunc %s(gok *Gok){%s\n}"
+    funcName := fmt.Sprintf("Render%s", genRandName())
+    imports, r, err := buildImports(code)
+    if err != nil {
+        return "", "", err
+    }
+    goCode, err := buildGoCode(code[r:])
+    if err != nil {
+        return "", "", err
+    }
+    final := fmt.Sprintf(gofile, imports, funcName, goCode)
+    return final, funcName, nil
 }
 
 func buildImports(code string) (string, int, error) {
-	p := "<?goUse"
-	pe := "?>"
+    p := "<?goUse"
+    pe := "?>"
 	plen := len(p)
 	indx := strings.Index(code, p)
 	if indx == -1 {
