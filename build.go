@@ -25,10 +25,10 @@ func build() error {
     webRoutes = make(map[string]string)
     shouldDelete = list.New()
     convertGokToGoFiles(".")
-    unpackResource();
-    injectRoutes();
-    out := goBuild();
-    defer delFiles(shouldDelete);
+    unpackResource()
+    injectRoutes()
+    out := goBuild()
+    defer delFiles(shouldDelete)
     if len(out) != 0 {
         out = convertGoErrorsToGok(out);
         return errors.New(out)
@@ -126,7 +126,7 @@ func goBuild() string {
     return string(output)
 }
 
-func converGoErrorsToGok(output string) string {
+func convertGoErrorsToGok(output string) string {
     out := new(bytes.Buffer)
     lines := strings.Split(output, "\n")
     for _, l := range lines {
@@ -234,6 +234,6 @@ func findLnInGokFile(gokContent string, ln string, skipCount int) int {
 }
 
 func buildGoFileName(p string) string {
-    ret := strings.Replace(p, "/", "[", -1);
-    return ret+".go";
+    ret := strings.Replace(p, "/", "[", -1)
+    return ret+".go"
 }

@@ -42,6 +42,14 @@ func buildImports(code string) (string, int, error) {
 }
 
 func buildGoCode(code string) (string, error) {
+    code, err = extractGoFuncs(code);
+}
+
+func extractGoFuncs(code string) (string, error) {
+
+}
+
+func buildRenderFunc(code string) (string, error) {
     echoFunc := "\ngok.Echo(\"%s\");"
     p := "<?go "
     pe := "?>"
