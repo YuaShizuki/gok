@@ -20,19 +20,19 @@ func processGokContent(code string) (string, string, error) {
 }
 
 func buildImports(code string) (string, int, error) {
-	p := "<?go-imports"
+	p := "<?goUse"
 	pe := "?>"
 	plen := len(p)
 	indx := strings.Index(code, p)
 	if indx == -1 {
-		return "", 0, nil
+		return "package main\n", 0, nil
 	}
 	indxEnd := strings.Index(code, pe)
 	if indxEnd == -1 {
 		return "", -1, errors.New("unknown code pattern")
 	}
 	if indxEnd == (indx + plen) {
-		return "", -1, nil
+		return "package main\n", 0, nil
 	}
 	imports := strings.Split(code[(indx+plen):indxEnd], "\n")
 	for i := range imports {
