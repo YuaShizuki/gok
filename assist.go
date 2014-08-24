@@ -1,10 +1,16 @@
 package main
-
 import "fmt"
 import "os"
 import "encoding/hex"
 import "math/rand"
 import "time"
+import "container/list"
+
+func delFiles(l *list.List) {
+    for e := l.Front(); e != nil; e = e.Next() {
+        os.Remove(e.Value.(string))
+    }
+}
 
 func pathExist(p string) bool {
     _, err := os.Stat(p)
