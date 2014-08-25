@@ -6,26 +6,21 @@ import "bytes"
 import "errors"
 import "container/list"
 
-func main() {
-    f, err := ioutil.ReadFile("i.gok")
-    code, function, err := compile(string(f))
-    if err != nil {
-        fmt.Println(err)
-        return;
-    }
-    fmt.Println(code)
-    fmt.Println(function)
-}
-
 func compile(code string) (string, string, error) {
     lines := strings.Split(code, "\n")
     processed := list.New()
-    header, err := extract("<?gohead", lines, processed)
-    if err != nil { return "", "", err }
+    use, err := extract("<?gouse", lines, processed)
+    if err != nil {
+        return "", "", err
+    }
     funcs, err := extract("<?gofunc", lines, processed)
-    if err != nil { return "", "", nil }
-    gorenderer := createRenderer(lines, processed)
-    return header+"\n"+funcs+"\nfunc render(){\n"+gorenderer+"\n}\n", "salvadorDali", err
+    if err != nil {
+        return "", "", nil
+    }
+    renderer := createRenderer(lines, processed)
+    randName := "Render"+genRandName()
+    gocode := use + "\n"+funcs+\nfunc "+randName+"(gok *Gok) {\n"+renderer+"\n}\n"
+    return gocode, randName, err
 }
 
 type analyzed struct {

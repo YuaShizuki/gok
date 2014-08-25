@@ -46,7 +46,7 @@ func convertGokToGoFiles(dir string) {
         if err != nil {
             errExit(err, "")
         }
-        gocode, mainFunc, err := processGokContent(string(gokContent))
+        gocode, mainFunc, err := compile(string(gokContent))
         if err != nil {
             errExit(err, "")
         }
@@ -159,12 +159,8 @@ func convertGoErrorsToGok(output string) string {
             fmt.Fprintln(out, l)
             continue
         }
-        gokFileLn, err := gokFileLineNum(gokFile, file, lineNum)
-        if err != nil {
-            fmt.Fprintln(out, l)
-            continue
-        }
-        fmt.Fprintf(out, "%s:%d:%s\n", gokFile, gokFileLn, l[indx2+1:])
+        gokFileLn := gokFileLineNum(file, lineNum)
+        fmt.Fprintf(out, "%s:%s:%s\n", gokFile, gokFileLn, l[indx2+1:])
     }
     return out.String();
 }
@@ -185,52 +181,14 @@ func getEquivalentGokFile(file string) string {
 }
 
 
-func gokFileLineNum(gokFile string, file string, ln int) (int, error) {
+func gokFileLineNum(file string, ln int) string {
     f, err := ioutil.ReadFile(file)
-    if err != nil {
-        return 0, err
-    }
-    gokFileContent, err := ioutil.ReadFile(gokFile)
-    if err != nil {
-        return 0, err
-    }
     lines := strings.Split(string(f), "\n")
-    if len(lines) < ln {
-        return 0, errors.New("line numbers exceds existing lines")
+    comment := lines[ln-2]
+    if len(comment) <= 3 {
+        return "0"
     }
-    duplicates := countDuplicatesTill(lines, ln)
-    orignalLn := findLnInGokFile(string(gokFileContent), lines[ln-1], duplicates)
-    return orignalLn, nil
-}
-
-func countDuplicatesTill(code []string, ln int) int {
-    initial := code[ln-1]
-    count := 0
-    for _, c := range code {
-        if count == ln-1 {
-            return count
-        }
-        if c == initial {
-            count++
-        }
-    }
-    return count
-}
-
-func findLnInGokFile(gokContent string, ln string, skipCount int) int {
-    last := 0
-    for i := 0; i < (skipCount + 1); i++ {
-        slice := gokContent[last:]
-        indx := strings.Index(slice, ln)
-        if indx == -1 {
-            break
-        }
-        last += indx
-    }
-    if last == 0 {
-        return 0
-    }
-    return strings.Count(gokContent[0:last], "\n") + 1
+    return comment[2:]
 }
 
 func buildGoFileName(p string) string {
