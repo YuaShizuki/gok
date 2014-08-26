@@ -35,7 +35,7 @@ func compile(code string) (string, string, error) {
     /*- create renderer  -*/
     renderer := createRenderer(lines, processed)
     randName := "Render"+genRandName()
-    fullcode := "package main\n"+imports+uses+funcs+"func GokRender"+randName+
+    fullcode := "package main\n"+imports+uses+funcs+"func "+randName+
                 "(gok *Gok){\n"+renderer+"\n}"
     return fullcode, randName, err
 }
@@ -156,7 +156,7 @@ func createRenderer(lines []string, processed *list.List) string {
 func processln(s string, ln int, static *bool) []byte {
     if regsrch == nil {
         var err error
-        regsrch, err = regexp.Compile("\\<\\?go\\s?[^(fn)(vars)(imp)]")
+        regsrch, err = regexp.Compile("(\\<\\?go$|\\<\\?go\\s)")
         if err != nil {
             return []byte("")
         }
