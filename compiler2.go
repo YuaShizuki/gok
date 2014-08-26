@@ -23,7 +23,6 @@ func main() {
 
 func compile(gokcode string) string {
     gokcodeLen := len(gokcode)
-    final := new(bytes.Buffer)
 
     imports := new(bytes.Buffer)
     renderer := new(bytes.Buffer)
@@ -68,5 +67,65 @@ func compile(gokcode string) string {
             break
         }
     }
-    
+    return "package main\n"+imports.String()+uses.String()+funcs.String()+
+        "func Render(gok *Gok){\n"+renderer.String()+"\n}\n"
 }
+
+func getLineNum(code string) int {
+    return strings.Count(code, "\n")
+}
+
+
+func processfn(code string, lnoff int) (string, int) {
+    out := new(bytes.Buffer)
+    out.WriteString(fmt.Sprintf("//%d\nfunc ", lnoff))
+    lns := strings.Split(code, "\n")
+    llns := len(lns)
+    if llns == 0 {
+        return "", addfn
+    }
+    out.WriteString(lns[0]+"\n")
+    for i := 1; i < llns; i++ {
+        out.WriteString(fmt.Sprintf("//%d\n%s\n", lnoff+i, lns[i]))
+    }
+    return out.String(), addfn
+}
+
+func processgo(code string, lnoff int) (string, int) {
+    out := new(bytes.Buffer)
+    lns := strings.Split(code, "\n")
+    if len(lns) == 0 {
+        return "", addrenderer
+    }
+    for i,s := range lns {
+        out.WriteString(fmt.Sprintf("//%d\n%s\n",i+lnoff,s))
+    }
+    return out.String(), addrenderer
+}
+
+func processuse(code string, lnoff int) (string, int) {
+    out := new(bytes.Buffer)
+    lns := string.Split(code, "\n")
+    if len(lns) == 0 {
+        return "", adduses
+    }
+    for i,s := range lns {
+        out.WriteString(fmt.Sprintf("//%d\n%s\n", lnoff+i, s))
+    }
+    return out.String(), adduses
+}
+
+func procesimp(code string, lnoff int) {
+    lns := strings.Split(code)
+    if len(lns) == 0 {
+        return "", addimports
+    }
+    out := new(bytes.Buffer)
+    out.WriteString("import(\n")
+    for i, s := range lns {
+        out.WriteString(fmt.Sprintf("//%d\n%s\n", lnoff+i, s))
+    }
+    out.WriteString(")\n")
+    return out.String(), addimports
+}
+
