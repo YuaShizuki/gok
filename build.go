@@ -21,25 +21,28 @@ var (
     shouldDelete  *list.List
 )
 
-func build() error {
+func build(src bool) error {
     webRoutes = make(map[string]string)
     shouldDelete = list.New()
     convertGokToGoFiles(".")
     unpackResource()
     injectRoutes()
+    if src {
+        return nil
+    }
     out := goBuild()
     defer delFiles(shouldDelete)
     if len(out) != 0 {
-        out = convertGoErrorsToGok(out);
+        out = convertGoErrorsToGok(out)
         return errors.New(out)
     }
     return nil;
 }
 
 func convertGokToGoFiles(dir string) {
-    files, err := filepath.Glob(dir + "/*.gok");
+    files, err := filepath.Glob(dir + "/*.gok")
     if err != nil {
-        errExit(err, "");
+        errExit(err, "")
     }
     for _, s := range files {
         gokContent, err := ioutil.ReadFile(s)
@@ -183,10 +186,14 @@ func getEquivalentGokFile(file string) string {
 
 func gokFileLineNum(file string, ln int) string {
     f, err := ioutil.ReadFile(file)
+    if err != nil {
+        fmt.Println("gokFileLineNum Error => ",err)
+        return "0"
+    }
     lines := strings.Split(string(f), "\n")
     comment := lines[ln-2]
-    if len(comment) <= 3 {
-        return "0"
+    if len(comment) < 2 {
+        return "[unknown ln]"
     }
     return comment[2:]
 }

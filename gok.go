@@ -8,14 +8,14 @@ func main() {
     }
     switch os.Args[1] {
         case "build":
-            err := build();
+            err := build(false);
             if err != nil {
                 fmt.Println(err.Error());
             }
         case "run":
             fmt.Println("under construction")
         case "src":
-            fmt.Println("under construction")
+            build(true)
         case "api":
             fmt.Println("under construction")
     }
