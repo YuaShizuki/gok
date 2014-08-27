@@ -1,152 +1,147 @@
 package main
 import "fmt"
+import "regexp"
+import "io/ioutil"
 import "strings"
 import "bytes"
-import "errors"
-import "container/list"
-import "regexp"
 
-var regsrch *regexp.Regexp
-var regsrch2 *regexp.Regexp
+const(
+    addfn = iota
+    adduses = iota
+    addrenderer = iota
+    addimports = iota
+)
+type processor func(string, int)(string, int)
 
-func compile(code string) (string, string, error) {
-    lines := strings.Split(code, "\n")
-    processed := list.New()
-    /*- create imports -*/
-    imp, err := extract("<?goimp", lines, processed)
-    if err != nil {
-        return "", "", err
+func compile(gokcode string) string {
+    gokcodeLen := len(gokcode)
+
+    imports := new(bytes.Buffer)
+    renderer := new(bytes.Buffer)
+    uses := new(bytes.Buffer)
+    funcs := new(bytes.Buffer)
+
+    regsearch := make(map[*regexp.Regexp]processor)
+    r1,_ := regexp.Compile("\\<\\?gofn\\s")
+    regsearch[r1] = processfn
+    r2,_ := regexp.Compile("\\<\\?go\\s")
+    regsearch[r2] = processgo
+    r3,_ := regexp.Compile("\\<\\?gouse\\s")
+    regsearch[r3] = processuse
+    r4,_:= regexp.Compile("\\<\\?goimp\\s")
+    regsearch[r4] = processimp
+
+    regend,_ := regexp.Compile("\\?\\>")
+
+    for last := 0; last < gokcodeLen; {
+        slice := gokcode[last:]
+        end := regend.FindIndex([]byte(slice))
+        if end == nil {
+            echo := createEcho(slice[:], getLineNum(gokcode[:last]))
+            renderer.WriteString(echo)
+            break
+        }
+        for k, v := range regsearch {
+            start := k.FindIndex([]byte(slice))
+            if (start == nil) || (start[1] > end[0]) {
+                continue
+            }
+            lnoffset := getLineNum(gokcode[:last])
+            echo := createEcho(slice[:start[0]], lnoffset)
+            renderer.WriteString(echo)
+            code, typ := v(slice[start[1]:end[0]],lnoffset)
+            switch typ {
+                case addimports:
+                    imports.WriteString(code)
+                case addrenderer:
+                    renderer.WriteString(code)
+                case adduses:
+                    uses.WriteString(code)
+                case addfn:
+                    funcs.WriteString(code)
+            }
+            last += end[1]
+            break
+        }
     }
-    imports := ""
-    if len(imp) != 0 && strings.TrimSpace(imp) != "" {
-        imports = "import (\n"+imp+"\n)\n"
-    }
-    /*- create functions  -*/
-    fn, err := extract("<?gofn", lines, processed)
-    if err != nil {
-        return "", "", err
-    }
-    funcs := processfnExtract(fn)
-    /*- create use  -*/
-    uses, err := extract("<?gouse", lines, processed)
-    if err != nil {
-        return "", "", err
-    }
-    /*- create renderer  -*/
-    renderer := createRenderer(lines, processed)
-    randName := "Render"+genRandName()
-    fullcode := "package main\n"+imports+uses+funcs+"func "+randName+
-                "(gok *Gok){\n"+renderer+"\n}"
-    return fullcode, randName, err
+    return "package main\n"+imports.String()+uses.String()+funcs.String()+
+        "func Render(gok *Gok){\n"+renderer.String()+"\n}\n"
 }
 
-func processfnExtract(s string) string {
-    if (len(s) == 0) || (strings.TrimSpace(s) == "") {
+func getLineNum(code string) int {
+    return strings.Count(code, "\n")
+}
+
+
+func processfn(code string, lnoff int) (string, int) {
+    out := new(bytes.Buffer)
+    out.WriteString(fmt.Sprintf("//%d\nfunc ", lnoff))
+    lns := strings.Split(code, "\n")
+    llns := len(lns)
+    if llns == 0 {
+        return "", addfn
+    }
+    out.WriteString(strings.TrimSpace(lns[0])+"\n")
+    for i := 1; i < llns; i++ {
+        s := strings.TrimSpace(lns[i])
+        out.WriteString(fmt.Sprintf("//%d\n%s\n", lnoff+i, s))
+    }
+    return out.String(), addfn
+}
+
+func processgo(code string, lnoff int) (string, int) {
+    out := new(bytes.Buffer)
+    lns := strings.Split(code, "\n")
+    if len(lns) == 0 {
+        return "", addrenderer
+    }
+    for i,s := range lns {
+        s := strings.TrimSpace(s)
+        out.WriteString(fmt.Sprintf("//%d\n%s\n",i+lnoff, s))
+    }
+    return out.String(), addrenderer
+}
+
+func processuse(code string, lnoff int) (string, int) {
+    out := new(bytes.Buffer)
+    lns := strings.Split(code, "\n")
+    if len(lns) == 0 {
+        return "", adduses
+    }
+    for i,s := range lns {
+        s := strings.TrimSpace(s)
+        out.WriteString(fmt.Sprintf("//%d\n%s\n", lnoff+i, s))
+    }
+    return out.String(), adduses
+}
+
+func processimp(code string, lnoff int) (string, int) {
+    lns := strings.Split(code, "\n")
+    if len(lns) == 0 {
+        return "", addimports
+    }
+    out := new(bytes.Buffer)
+    out.WriteString("import(\n")
+    for i, s := range lns {
+        s = strings.TrimSpace(s)
+        out.WriteString(fmt.Sprintf("//%d\n%s\n", lnoff+i, s))
+    }
+    out.WriteString(")\n")
+    return out.String(), addimports
+}
+
+func createEcho(code string, lnoff int) string {
+    formatedStr := formateStr(code)
+    if formatedStr != "" {
+        return fmt.Sprintf("//%d\ngok.Echo(\"%s\")\n", lnoff, formatedStr)
+    }
+    return ""
+}
+
+func formateStr(s string) string {
+    if strings.TrimSpace(s) == "" {
         return ""
     }
-    lns := strings.Split(s, "\n")
-    lns[1] = "func "+lns[1]
-    return strings.Join(lns, "\n")
-}
-
-type analyzed struct {
-    ln int
-    col1 int
-    col2 int
-}
-
-func containsln(processed *list.List, ln int) (col1, col2 int) {
-    for e := processed.Front(); e != nil; e = e.Next() {
-        lnsAndCols := e.Value.(*analyzed)
-        if lnsAndCols.ln == ln {
-            return lnsAndCols.col1, lnsAndCols.col2
-        }
-    }
-    return -1, -1
-}
-
-func extract(pattern string, lines []string, processed *list.List) (string, error) {
-}
-
-func createRenderer(lines []string, processed *list.List) string {
-    gocode := new(bytes.Buffer)
-    processlnStatic := false
-    for i, l := range lines {
-        lenl := len(l)
-        col1, col2 := containsln(processed, i)
-        var i1, i2 int
-        if (col1 == 0) && (col2 == lenl) {
-            continue
-        } else if (col1 == -1) && (col2 == -1) {
-            i1 = 0
-            i2 = lenl
-        } else if (col1 == 0) {
-            i1 = col2
-            i2 = lenl
-        } else if (col2 == lenl) {
-            i1 = 0
-            i2 = col1
-        }
-        slice := l[i1:i2]
-        gocode.Write(processln(slice, i+1, &processlnStatic))
-    }
-    return gocode.String()
-}
-
-func processln(s string, ln int, static *bool) []byte {
-    if regsrch == nil {
-        var err error
-        regsrch, err = regexp.Compile("(\\<\\?go$|\\<\\?go\\s)")
-        if err != nil {
-            return []byte("")
-        }
-    }
-    gocode := new(bytes.Buffer)
-    slen := len(s)
-    for last := 0; last < slen; {
-        slice := s[last:]
-        indx1 := -1
-        indx1End := 0
-        temp := regsrch.FindIndex([]byte(slice))
-        if temp != nil {
-            indx1 = temp[0]
-            indx1End = temp[1]
-        }
-        indx2 := strings.Index(slice, "?>")
-        if (indx1 == -1) && (indx2 == -1) {
-            /*- determine if this is html or go code -*/
-            if (*static) {
-                fmt.Fprintf(gocode, "//%d\n%s\n", ln, slice)
-            } else {
-                fmt.Fprintf(gocode, "//%d\ngok.Echo(\"%s\")\n", ln, buildStr(slice))
-            }
-            break
-        } else if ((indx1 < indx2) && (indx1 != -1)) || (indx2 == -1) {
-            if indx2 == -1 {
-                indx2 = len(slice)
-                *static = true
-            }
-            if strings.TrimSpace(slice[:indx1]) != "" {
-                fmt.Fprintf(gocode, "//%d\ngok.Echo(\"%s\")\n", ln, buildStr(slice[:indx1]))
-            }
-            fmt.Fprintf(gocode, "//%d\n%s\n", ln, slice[indx1End:indx2])
-            last += (indx2+2)
-        } else {
-            if indx1 == -1 {
-                indx1 = len(slice)
-                indx1End = 5
-                (*static) = false
-            }
-            fmt.Fprintf(gocode, "//%d\n%s\n", ln, buildStr(slice[:indx2]))
-            fmt.Fprintf(gocode, "//%d\ngok.Echo(\"%s\")\n", ln, slice[indx2+2:indx1])
-            last += (indx1End)
-
-        }
-    }
-    return gocode.Bytes()
-}
-
-func buildStr(s string) string {
     s = strings.Replace(s, "\n", "\\n", -1)
     s = strings.Replace(s, "\t", "\\t", -1)
     s = strings.Replace(s, "\r", "\\r", -1)
@@ -155,4 +150,3 @@ func buildStr(s string) string {
     s = strings.Replace(s, "\"", "\\\"", -1)
     return strings.TrimSpace(s)
 }
-
