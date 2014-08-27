@@ -1,7 +1,6 @@
 package main
 import "fmt"
 import "regexp"
-import "io/ioutil"
 import "strings"
 import "bytes"
 
@@ -13,7 +12,7 @@ const(
 )
 type processor func(string, int)(string, int)
 
-func compile(gokcode string) string {
+func compile(gokcode string) (string, string) {
     gokcodeLen := len(gokcode)
 
     imports := new(bytes.Buffer)
@@ -46,7 +45,10 @@ func compile(gokcode string) string {
             if (start == nil) || (start[1] > end[0]) {
                 continue
             }
-            lnoffset := getLineNum(gokcode[:last])
+            lnoffset := getLineNum(gokcode[:(last+start[0])])
+            if slice[start[1]-1] == '\n' {
+                lnoffset++
+            }
             echo := createEcho(slice[:start[0]], lnoffset)
             renderer.WriteString(echo)
             code, typ := v(slice[start[1]:end[0]],lnoffset)
@@ -64,12 +66,14 @@ func compile(gokcode string) string {
             break
         }
     }
-    return "package main\n"+imports.String()+uses.String()+funcs.String()+
-        "func Render(gok *Gok){\n"+renderer.String()+"\n}\n"
+    rendererName := "Render"+genRandName()
+    final := "package main\n"+imports.String()+uses.String()+funcs.String()+
+            "func "+rendererName+"(gok *Gok) {\n"+renderer.String()+"\n}\n"
+    return final, rendererName
 }
 
 func getLineNum(code string) int {
-    return strings.Count(code, "\n")
+    return strings.Count(code, "\n")+1
 }
 
 

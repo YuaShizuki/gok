@@ -49,10 +49,7 @@ func convertGokToGoFiles(dir string) {
         if err != nil {
             errExit(err, "")
         }
-        gocode, mainFunc, err := compile(string(gokContent))
-        if err != nil {
-            errExit(err, "")
-        }
+        gocode, mainFunc := compile(string(gokContent))
         webRoutes[s] = mainFunc
         goFile := buildGoFileName(s)
         shouldDelete.PushBack(goFile)
