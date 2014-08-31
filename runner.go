@@ -7,9 +7,6 @@ import "os/exec"
 import "net"
 import "strings"
 
-
-var closeHttpServer net.Conn
-
 var controllerListener net.Listener
 
 func runner() {
@@ -38,6 +35,7 @@ func run() error {
     cmd.Run()
 }
 
+/*- http server (child process) controller -*/
 func controller() (string, error) {
     controllerListener, err := net.Listen("tcp", "127.0.0.1:0")
     if err != nil {
@@ -48,7 +46,6 @@ func controller() (string, error) {
     return port, nil
 }
 
-/*- this would switch off the http server running on sudo -*/
 func switchOffContorler() {
     if controllerListener != nil {
         controllerListener.Close()
@@ -64,6 +61,8 @@ func controllerStart() {
     ioutil.ReadAll(conn)
     switchOffControler()
 }
+/*- End -*/
+
 
 func startNotifier() {
     goorgok := regexp.Compile("(.*\\.go|.*\\.gok)$")
@@ -76,18 +75,17 @@ func startNotifier() {
         select {
             case event := <-watch.Event:
                 if goorgok.Match([]byte(event.Name())) {
-                    stopErrorServer()
+                    txtserve.StopServer()
+                    switchOffControler()
                     err := run()
                     if err != nil {
-                        startErrorServer(err.Error())
+                        txtserve.StartServer(err.Error())
                     }
                 }
+            case err := <-watch.Error:
+                fmt.Println("runner out of controll")
+                os.Exit(1)
         }
     }
 }
 
-func startErrorServer(content string) {
-
-}
-
-func stopErrorServer()

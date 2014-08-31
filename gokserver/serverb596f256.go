@@ -2,6 +2,11 @@ package main
 import "fmt"
 import "net/http"
 import "io/ioutil"
+import "net"
+import "regexp"
+import "strings"
+
+var coreListener net.Listener
 
 var routes map[string]func(*Gok) = map[string]func(*Gok) {
 //<gok inject routes>
@@ -32,10 +37,26 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-    http.Handle("/", new(mainHandler))
-    fmt.Println("server running like a bitch!");
-    err := http.ListenAndServe(":80", nil);
+    coreListener, err := net.Listen("tcp", ":80")
     if err != nil {
-        fmt.Println(err);
+        errExit(err)
+    }
+    go controller()
+    http.Serve(coreListener, new(mainHandler))
+}
+
+func controller() {
+    regsrch,_ := regexp.Compile("^gokcontroller=[0-9]+$")
+    for _, command := range os.Args {
+        if regsrch.Match([]byte(command)) {
+            port := strings.Split("=")[1]
+            conn, err := net.Dial("tcp", "127.0.0.1:"+port)
+            if err != nil {
+                errExit(err)
+            }
+            ioutil.ReadAll(conn)
+            coreListener.Close()
+            return
+        }
     }
 }
