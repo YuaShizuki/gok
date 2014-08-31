@@ -4,7 +4,6 @@ import "time"
 import "net/http"
 import "io/ioutil"
 import "strings"
-import "fmt"
 
 func getForTest() (string, error) {
     resp, err := http.Get("http://127.0.0.1/")
@@ -30,13 +29,13 @@ func TestServer(t *testing.T) {
     if (err != nil) || (response != "TEST") {
         t.Fatal(err, response)
     }
-    err := StopServer()
+    err = StopServer()
     if err != nil {
         t.Fatal(err)
     }
     time.Sleep(5 * time.Second)
-    response, err := getForTest()
-    if (err == nil)  || (response != "") {
+    response, err = getForTest()
+    if (err == nil)  || (response == "TEST") {
         t.Fatal("server still running")
     }
 }
