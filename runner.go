@@ -4,17 +4,23 @@ import "github.com/howeyc/fsnotify"
 import "io/ioutil"
 import "path/filepath"
 import "os/exec"
+import "os"
 import "net"
 import "strings"
+import "regexp"
+import "./txtserve"
 
 var controllerListener net.Listener
+var fswatcherRunning bool = false
+
 
 func runner() {
-    go startNotifier()
     err := run()
     if err != nil {
-        fmt.Println(err)
+        errExit(err, "")
     }
+    done := make(chan bool)
+    <-done
 }
 
 func run() error {
@@ -24,29 +30,31 @@ func run() error {
     }
     pwd,_ := os.Getwd()
     exe := filepath.Base(pwd)
-    port, err := controler()
+    port, err := controller()
     if err != nil {
         return err
     }
-    cmd := exec.Command("sudo", exe, "gokcontroller="+port)
+    cmd := exec.Command("sudo", "./"+exe, "gokcontroller="+port)
     cmd.Stdin = os.Stdin
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
     cmd.Run()
+    return nil
 }
 
 /*- http server (child process) controller -*/
 func controller() (string, error) {
-    controllerListener, err := net.Listen("tcp", "127.0.0.1:0")
+    var err error
+    controllerListener, err = net.Listen("tcp", "127.0.0.1:0")
     if err != nil {
         return "", err
     }
-    port := strings.Split(l.Addr().String, ":")[1]
+    port := strings.Split(controllerListener.Addr().String(), ":")[1]
     go controllerStart()
     return port, nil
 }
 
-func switchOffContorler() {
+func switchOffController() {
     if controllerListener != nil {
         controllerListener.Close()
         controllerListener = nil
@@ -58,33 +66,36 @@ func controllerStart() {
     if err != nil {
         return
     }
+    go startNotifier()
     ioutil.ReadAll(conn)
-    switchOffControler()
+    switchOffController()
 }
 /*- End -*/
 
 
 func startNotifier() {
-    goorgok := regexp.Compile("(.*\\.go|.*\\.gok)$")
+    goorgok,_ := regexp.Compile("(.*\\.go|.*\\.gok)$")
     watch, err := fsnotify.NewWatcher()
     if err != nil {
         fmt.Println(err)
-        os.Exit()
+        os.Exit(1)
     }
+    watch.Watch(".")
     for ;; {
         select {
             case event := <-watch.Event:
-                if goorgok.Match([]byte(event.Name())) {
+                if goorgok.Match([]byte(event.Name)) {
+                    fmt.Println("building new =>", event.Name)
                     txtserve.StopServer()
-                    switchOffControler()
+                    switchOffController()
                     err := run()
                     if err != nil {
                         txtserve.StartServer(err.Error())
+                    } else {
+                        watch.Close()
+                        return
                     }
                 }
-            case err := <-watch.Error:
-                fmt.Println("runner out of controll")
-                os.Exit(1)
         }
     }
 }

@@ -3,6 +3,7 @@ import "time"
 import "math/rand"
 import "encoding/hex"
 import "os"
+import "fmt"
 
 func pathExist(path string) (bool, os.FileInfo) {
     info, err :=  os.Stat(path);

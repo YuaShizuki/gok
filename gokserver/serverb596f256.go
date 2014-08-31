@@ -2,6 +2,7 @@ package main
 import "fmt"
 import "net/http"
 import "io/ioutil"
+import "os"
 import "net"
 import "regexp"
 import "strings"
@@ -20,7 +21,7 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     fn, ok := routes[gok.ServerSelf()];
     if ok {
         fn(gok);
-        fmt.Fprint(w, gok.response);
+        fmt.Fprintln(w, gok.response);
     } else {
         if exist,_ := pathExist(gok.ServerSelf()); exist {
             http.ServeFile(w, r, gok.ServerSelf());
@@ -49,7 +50,7 @@ func controller() {
     regsrch,_ := regexp.Compile("^gokcontroller=[0-9]+$")
     for _, command := range os.Args {
         if regsrch.Match([]byte(command)) {
-            port := strings.Split("=")[1]
+            port := strings.Split(command, "=")[1]
             conn, err := net.Dial("tcp", "127.0.0.1:"+port)
             if err != nil {
                 errExit(err)
