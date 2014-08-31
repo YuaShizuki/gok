@@ -8,26 +8,16 @@ import "net"
 import "strings"
 
 
-var closeHttpServer func() error
+var closeHttpServer net.Conn
+
+var controllerListener net.Listener
 
 func runner() {
-    err := build(false)
+    go startNotifier()
+    err := run()
     if err != nil {
         fmt.Println(err)
-        return
     }
-    pwd,_ := os.Getwd()
-    exe := filepath.Base(pwd)
-    port, err := controler()
-
-    cmd := exec.Command("sudo", exe, "gokcontroller="+port)
-    cmd.Stdin = os.Stdin
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    go notifier()
-    cmd.Run()
-    end := make(chan bool)
-    <-end
 }
 
 func run() error {
@@ -48,28 +38,34 @@ func run() error {
     cmd.Run()
 }
 
-func controler() (string, error) {
-    l, err := net.Listen("tcp", "127.0.0.1:0")
+func controller() (string, error) {
+    controllerListener, err := net.Listen("tcp", "127.0.0.1:0")
     if err != nil {
-        return err
+        return "", err
     }
     port := strings.Split(l.Addr().String, ":")[1]
-    go holdingServer(l)
+    go controllerStart()
     return port, nil
 }
 
-func holdingServer(l net.Listener) {
-    conn, err := l.Accept()
-    closeHttpServer = conn.Close
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
+/*- this would switch off the http server running on sudo -*/
+func switchOffContorler() {
+    if controllerListener != nil {
+        controllerListener.Close()
+        controllerListener = nil
     }
-    ioutil.ReadAll(conn)
-    defer l.Close()
 }
 
-func notifier() {
+func controllerStart() {
+    conn, err := controllerListener.Accept()
+    if err != nil {
+        return
+    }
+    ioutil.ReadAll(conn)
+    switchOffControler()
+}
+
+func startNotifier() {
     goorgok := regexp.Compile("(.*\\.go|.*\\.gok)$")
     watch, err := fsnotify.NewWatcher()
     if err != nil {
@@ -78,16 +74,20 @@ func notifier() {
     }
     for ;; {
         select {
-            case event := <-watch.Event
+            case event := <-watch.Event:
                 if goorgok.Match([]byte(event.Name())) {
-                    closeHttpServer()
+                    stopErrorServer()
                     err := run()
                     if err != nil {
-                        startErrorServer(err)
-                    } else {
-                        shutdownErrorServer()
+                        startErrorServer(err.Error())
                     }
                 }
         }
     }
 }
+
+func startErrorServer(content string) {
+
+}
+
+func stopErrorServer()
