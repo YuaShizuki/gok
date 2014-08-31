@@ -1,4 +1,5 @@
-package main
+package txtserve
+import "testing"
 import "time"
 import "net/http"
 import "io/ioutil"
@@ -19,18 +20,20 @@ func getForTest() (string, error) {
 }
 
 
-func TestAll() {
+func TestServer(t *testing.T) {
     err := StartServer("TEST")
     if err != nil {
-        fmt.Println(err)
-        return
+        t.Fatal(err)
     }
+    time.Sleep(5 * time.Second)
     response, err := getForTest()
     if (err != nil) || (response != "TEST") {
         t.Fatal(err, response)
     }
-    time.Sleep(5 * time.Second)
     err := StopServer()
+    if err != nil {
+        t.Fatal(err)
+    }
     time.Sleep(5 * time.Second)
     response, err := getForTest()
     if (err == nil)  || (response != "") {
