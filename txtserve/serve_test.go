@@ -25,17 +25,17 @@ func TestServer(t *testing.T) {
         t.Fatal(err)
     }
     time.Sleep(5 * time.Second)
-    response, err := getForTest()
-    if (err != nil) || (response != "TEST") {
-        t.Fatal(err, response)
+    resp, err := getForTest()
+    if (err != nil) || (resp != "TEST") {
+        t.Fatal(err, resp)
     }
     err = StopServer()
     if err != nil {
         t.Fatal(err)
     }
     time.Sleep(5 * time.Second)
-    response, err = getForTest()
-    if (err == nil)  || (response == "TEST") {
+    resp, err = getForTest()
+    if (err == nil)  || (resp == "TEST") {
         t.Fatal("server still running")
     }
 }

@@ -1,24 +1,41 @@
 package txtserve
 import "fmt"
 import "net"
-import "net/http"
 import "errors"
+import "strings"
 
 var running bool = false
-var onlyResponse string
+var response string
+var header string = "HTTP/1.1 200 OK\r\nContent-Type: text; charset=UTF-8\r\nContent-Length: %d\r\nConnection: Close\r\n\r\n"
 var mainListener net.Listener
 
-type mainHandler struct {}
-func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Connection", "close")
-    fmt.Fprintln(w, onlyResponse)
-}
-
 func serv() {
-    if err := http.Serve(mainListener, new(mainHandler)); err != nil {
-        StopServer()
+    for ;; {
+        conn, err := mainListener.Accept()
+        if (err != nil) || (conn == nil) {
+            return
+        }
+        temp := make([]byte, 512)
+        for ;; {
+            n, err := conn.Read(temp)
+            if (n == 0) || (err != nil) {
+                break
+            }
+            resp := string(temp[0:n])
+            if strings.Index(resp, "\r\n\r\n") != -1 {
+                break
+            }
+        }
+        _, err = conn.Write([]byte(fmt.Sprintf(header, len(response)+2)))
+        if err != nil { continue }
+        _, err = conn.Write([]byte(response))
+        if err != nil { continue }
+        _, err = conn.Write([]byte("\r\n"))
+        if err != nil { continue }
+        conn.Close()
     }
 }
+
 
 func StartServer(content string) error {
     l, err := net.Listen("tcp", ":80")
@@ -26,7 +43,7 @@ func StartServer(content string) error {
         return err
     }
     mainListener = l
-    onlyResponse = content
+    response = content
     running = true
     go serv()
     return nil

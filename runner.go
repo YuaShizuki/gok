@@ -9,6 +9,7 @@ import "net"
 import "strings"
 import "regexp"
 import "./txtserve"
+import "time"
 
 var controllerListener net.Listener
 var controllerConn net.Conn
@@ -78,6 +79,7 @@ func controllerStart() {
 
 
 func startNotifier() {
+    lastUpdate := time.Now()
     goorgok,_ := regexp.Compile("^([^.]*\\.go|[^.]*\\.gok)$")
     watch, err := fsnotify.NewWatcher()
     if err != nil {
@@ -89,18 +91,20 @@ func startNotifier() {
         select {
             case event := <-watch.Event:
                 if goorgok.Match([]byte(event.Name)) {
+                    if time.Since(lastUpdate) < (1000 * time.Millisecond) {
+                        continue
+                    }
+                    lastUpdate = time.Now()
+                    fmt.Printf("%v: src code update => ", lastUpdate)
                     txtserve.StopServer()
                     switchOffController()
-                    waitTillPortShutDown(":80")
-                    err := run()
+                    time.Sleep(200 * time.Millisecond)
+                    err = run()
                     if err != nil {
-                        for i := 0; i <= len(watch.Event); i++ {
-                            <-watch.Event
-                        }
-                        fmt.Println("cannot update server, error in file > ", event.Name)
+                        fmt.Printf("error building server binary\n")
                         txtserve.StartServer(err.Error())
                     } else {
-                        fmt.Println("updating server")
+                        fmt.Printf("server binary build successful\n")
                         watch.Close()
                         return
                     }
