@@ -94,9 +94,11 @@ func startNotifier() {
                     waitTillPortShutDown(":80")
                     err := run()
                     if err != nil {
-                        fmt.Println("cannot update server, error in code")
+                        for i := 0; i <= len(watch.Event); i++ {
+                            <-watch.Event
+                        }
+                        fmt.Println("cannot update server, error in file > ", event.Name)
                         txtserve.StartServer(err.Error())
-                        return
                     } else {
                         fmt.Println("updating server")
                         watch.Close()

@@ -114,7 +114,7 @@ func injectRoutes() {
         routes.Write([]byte("\"" + k + "\":" + v + ",\n"))
     }
     final := strings.Join([]string{parts[0], string(routes.Bytes()), parts[1]}, "\n")
-    ioutil.WriteFile("serverb596f256.go", []byte(final), 0644)
+    ioutil.WriteFile("serve.auto.go", []byte(final), 0644)
 }
 
 func goBuild() string {
