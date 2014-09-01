@@ -6,7 +6,12 @@ import "strings"
 
 var running bool = false
 var response string
-var header string = "HTTP/1.1 200 OK\r\nContent-Type: text; charset=UTF-8\r\nContent-Length: %d\r\nConnection: Close\r\n\r\n"
+
+var header string = "HTTP/1.1 200 OK\r\n"+
+"Content-Type: text; charset=UTF-8\r\n"+
+"Content-Length: %d\r\n"+
+"Connection: Close\r\n\r\n"
+
 var mainListener net.Listener
 
 func serv() {
