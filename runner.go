@@ -78,7 +78,7 @@ func controllerStart() {
 
 
 func startNotifier() {
-    goorgok,_ := regexp.Compile("(.*\\.go|.*\\.gok)$")
+    goorgok,_ := regexp.Compile("^([^.]*\\.go|[^.]*\\.gok)$")
     watch, err := fsnotify.NewWatcher()
     if err != nil {
         fmt.Println(err)
@@ -94,11 +94,11 @@ func startNotifier() {
                     waitTillPortShutDown(":80")
                     err := run()
                     if err != nil {
-                        fmt.Println("cannot update server, error in go|gok code")
+                        fmt.Println("cannot update server, error in code")
                         txtserve.StartServer(err.Error())
                         return
                     } else {
-                        fmt.Println("restarting updated server")
+                        fmt.Println("updating server")
                         watch.Close()
                         return
                     }

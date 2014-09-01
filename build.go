@@ -99,7 +99,7 @@ func unpackResource() {
 
 func injectRoutes() {
     var routes bytes.Buffer
-    s, err := ioutil.ReadFile("serverb596f256.go")
+    s, err := ioutil.ReadFile("serve.auto.go")
     if err != nil {
         errExit(err, "")
     }
