@@ -14,7 +14,7 @@ type Gok struct {
     getValues url.Values
     response *bytes.Buffer
     deadMsg string
-    should_redirect bool
+    shouldRedirect bool
 };
 
 func (self *Gok) Echo(a ...interface{}) {
@@ -24,13 +24,14 @@ func (self *Gok) Echo(a ...interface{}) {
 }
 
 func (self *Gok) Redirect(newUrl string) {
-    self.should_redirect = true
+    self.shouldRedirect = true
     self.Header("Location:"+newUrl)
 }
 
 func (self *Gok) Die(msg string) {
+    self.response.Reset()
     self.response = nil
-    deadMsg = msg
+    self.deadMsg = msg
 }
 
 /*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_SERVER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
