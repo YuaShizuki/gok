@@ -38,7 +38,8 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-    coreListener, err := net.Listen("tcp", ":80")
+    var err error
+    coreListener, err = net.Listen("tcp", ":80")
     if err != nil {
         errExit(err)
     }
@@ -55,6 +56,7 @@ func controller() {
             if err != nil {
                 errExit(err)
             }
+            defer conn.Close()
             ioutil.ReadAll(conn)
             coreListener.Close()
             return

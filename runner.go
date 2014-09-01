@@ -11,8 +11,7 @@ import "regexp"
 import "./txtserve"
 
 var controllerListener net.Listener
-var fswatcherRunning bool = false
-
+var controllerConn net.Conn
 
 func runner() {
     err := run()
@@ -38,7 +37,7 @@ func run() error {
     cmd.Stdin = os.Stdin
     cmd.Stdout = os.Stdout
     cmd.Stderr = os.Stderr
-    cmd.Run()
+    go cmd.Run()
     return nil
 }
 
@@ -59,15 +58,20 @@ func switchOffController() {
         controllerListener.Close()
         controllerListener = nil
     }
+    if controllerConn != nil {
+        controllerConn.Close()
+        controllerConn = nil
+    }
 }
 
 func controllerStart() {
-    conn, err := controllerListener.Accept()
+    var err error
+    controllerConn, err = controllerListener.Accept()
     if err != nil {
         return
     }
     go startNotifier()
-    ioutil.ReadAll(conn)
+    ioutil.ReadAll(controllerConn)
     switchOffController()
 }
 /*- End -*/
@@ -85,13 +89,16 @@ func startNotifier() {
         select {
             case event := <-watch.Event:
                 if goorgok.Match([]byte(event.Name)) {
-                    fmt.Println("building new =>", event.Name)
                     txtserve.StopServer()
                     switchOffController()
+                    waitTillPortShutDown(":80")
                     err := run()
                     if err != nil {
+                        fmt.Println("cannot update server, error in go|gok code")
                         txtserve.StartServer(err.Error())
+                        return
                     } else {
+                        fmt.Println("restarting updated server")
                         watch.Close()
                         return
                     }

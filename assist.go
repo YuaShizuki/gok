@@ -5,6 +5,8 @@ import "encoding/hex"
 import "math/rand"
 import "time"
 import "container/list"
+import "net"
+import "io/ioutil"
 
 func delFiles(l *list.List) {
     for e := l.Front(); e != nil; e = e.Next() {
@@ -39,4 +41,14 @@ func printUsage() {
     fmt.Println("   $gok src");
     fmt.Println("   $gok api\n");
     os.Exit(1);
+}
+
+func waitTillPortShutDown(port string) {
+    conn, err := net.Dial("tcp", "127.0.0.1"+port)
+    if err != nil {
+        return
+    }
+    defer conn.Close()
+    ioutil.ReadAll(conn)
+    return
 }
