@@ -6,19 +6,19 @@ import "os"
 import "fmt"
 
 func pathExist(path string) (bool, os.FileInfo) {
-    info, err :=  os.Stat(path);
+    info, err :=  os.Stat(path)
     if err != nil {
-        return false, info;
+        return false, info
     }
-    return true, info;
+    return true, info
 }
 
 
 func genRandName() string {
-    rand.Seed(time.Now().UnixNano());
-    num := rand.Uint32();
-    str := []byte{ byte(num), byte(num >> 8), byte(num >> 16), byte(num >> 24) };
-    return hex.EncodeToString(str);
+    rand.Seed(time.Now().UnixNano())
+    num := rand.Uint32()
+    str := []byte{ byte(num), byte(num >> 8), byte(num >> 16), byte(num >> 24) }
+    return hex.EncodeToString(str)
 }
 
 func errExit(err error) {
