@@ -26,6 +26,7 @@ func (self *Gok) Echo(a ...interface{}) {
 func (self *Gok) Redirect(newUrl string) {
     self.shouldRedirect = true
     self.Header("Location:"+newUrl)
+    self.w.WriteHeader(http.StatusMovedPermanently)
 }
 
 func (self *Gok) Die(msg string) {
@@ -121,6 +122,10 @@ func (self *Gok) SetCookie(name string, value string, duration int64) {
     http.SetCookie(self.w, cookie)
 }
 
+func (self *Gok) DeleteCookie(name string) {
+    self.SetCookie(name, "deleted", -1000)
+}
+
 func (self *Gok) SetCookie_4(name string, value string, duration int64,
                                 urlPath string){
     if (len(name) == 0) || (len(value) == 0) {
@@ -214,6 +219,7 @@ func (self *Gok) Header(header string) {
 func (self *Gok) RequestHeader() http.Header {
     return self.r.Header
 }
+
 func (self *Gok) ResponseHeader() http.Header {
     return self.w.Header()
 }
