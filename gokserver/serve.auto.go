@@ -8,16 +8,16 @@ import "regexp"
 import "strings"
 import "bytes"
 
-var coreListener net.Listener
+var gok_coreListener net.Listener
 
-var routes map[string]func(*Gok) = map[string]func(*Gok) {
+var gok_routes map[string]func(*Gok) = map[string]func(*Gok) {
 //<gok inject routes>
 };
 
-type mainHandler struct{};
-func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+type gok_mainHandler struct{};
+func (_ *gok_mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     gok := buildGok(w, r)
-    fn, ok := routes[gok.ServerSelf()];
+    fn, ok := gok_routes[gok.ServerSelf()];
     if ok {
         fn(gok);
         if gok.deadMsg != "" {
@@ -27,7 +27,7 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         } else {
             fmt.Fprintln(w, gok.response.String())
         }
-    } else {
+    } else if !handleIfQuickAjx(gok) {
         if exist,_ := pathExist(gok.ServerSelf()); exist {
             http.ServeFile(w, r, gok.ServerSelf());
             return
@@ -44,12 +44,12 @@ func (_ *mainHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
     var err error
-    coreListener, err = net.Listen("tcp", ":80")
+    gok_coreListener, err = net.Listen("tcp", ":80")
     if err != nil {
         errExit(err)
     }
     go controller()
-    http.Serve(coreListener, new(mainHandler))
+    http.Serve(gok_coreListener, new(gok_mainHandler))
 }
 
 func controller() {
@@ -63,7 +63,7 @@ func controller() {
             }
             defer conn.Close()
             ioutil.ReadAll(conn)
-            coreListener.Close()
+            gok_coreListener.Close()
             return
         }
     }

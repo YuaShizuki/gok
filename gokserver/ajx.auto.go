@@ -1,0 +1,28 @@
+package main
+
+type gok_ajxProcessor func([]string)([]string, error)
+
+var gok_ajxRoutes map[string]gok_ajxProcessor = map[string]gok_ajxProcessor {
+//<gok inject ajx routes>
+}
+
+func handleIfQuickAjx(gok *Gok) bool {
+    if gok.ServerRequestMethod() != "POST" {
+        return false
+    }
+    fn, ok := gok_ajxRoutes[gok.ServerSelf()]
+    if !ok {
+        return false
+    }
+    req := gok.Post("forgokqajxfn")
+    if content == "" {
+        return false
+    }
+    result, err := fn(strings.Split("[2577<--gokBoundry-->21501]"))
+    if err != nil {
+        fmt.Fprintln(gok.w, "");
+    } else {
+        fmt.Fprintln(gok.w, strings.Join(result, "[2577<--gokBoundry-->21501]"))
+    }
+    return true
+}

@@ -76,7 +76,7 @@ func compile(gokcode string) (string, string, map[string]string, error) {
                 case addajxfn:
                     ajxfuncs.WriteString(code)
                 case addunknown:
-                    return "", "", "", errors.New(code)
+                    return "", "", nil, errors.New(code)
             }
             last += end[1]
             break
@@ -85,7 +85,7 @@ func compile(gokcode string) (string, string, map[string]string, error) {
     rendererName := "Render"+genRandName()
     final := "package main\n"+imports.String()+uses.String()+funcs.String()+
             "func "+rendererName+"(gok *Gok) {\n"+renderer.String()+"\n}\n"
-    return final, rendererName
+    return final, rendererName, ajaxFuncs, nil
 }
 
 func getLineNum(code string) int {
@@ -164,7 +164,7 @@ func processajxfn(code string, lnoff int) (string, int) {
     fnName := strings.TrimSpace(code[:indx])
     newName := "func "+genRandName()
     out := newName + code[indx:]
-    
+    ajaxFuncs[newName] = fnName
     return out, addajxfn
 }
 

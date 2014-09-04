@@ -31,6 +31,10 @@ func build(src bool) error {
     }
     unpackResource(shouldDelete)
     injectRoutes()
+    if len(quickAjax) != 0 {
+        buildGokJs(quickAjax)
+        injectAjxRoutes(quickAjax)
+    }
     if src {
         return nil
     }
