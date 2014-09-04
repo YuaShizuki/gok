@@ -72,6 +72,8 @@ func compile(gokcode string) (string, string, map[string]string, error) {
                     uses.WriteString(code)
                 case addfn:
                     funcs.WriteString(code)
+                case addajxfn:
+                    ajxfuncs.WriteString(code)
                 case addUnknown:
                     return "", "", "", errors.New(code)
             }

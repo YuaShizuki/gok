@@ -43,7 +43,7 @@ func printUsage() {
     os.Exit(1);
 }
 
-func unpackResource() {
+func unpackResource(created *list.List) {
     orignal, err := hex.DecodeString(Resource)
     if err != nil {
         errExit(err, "")
@@ -71,7 +71,7 @@ func unpackResource() {
         }
         ioutil.WriteFile(name, fileContent.Bytes(), os.FileMode(h.Mode))
         if name[len(name)-3:] == ".go" {
-            shouldDelete.PushBack(name)
+            created.PushBack(name)
         }
     }
 }
