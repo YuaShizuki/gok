@@ -9,28 +9,39 @@ const(
     adduses = iota
     addrenderer = iota
     addimports = iota
+    addajxfn = iota
 )
 type processor func(string, int)(string, int)
 
-func compile(gokcode string) (string, string) {
+var r1, r2, r3, r4, r5, regend *regexp.Regexp
+var goQuickAjaxFuncs map[string]string = nil
+var regsearch map[*regexp.Regexp]processor = make(map[*regexp.Regexp]processor)
+
+func compile(gokcode string) (string, string, map[string]string, error) {
     gokcodeLen := len(gokcode)
+    //reset the map, mabe populated during previous runs
+    goQuickAjaxFuncs = nil
+    goQuickAjaxFuncs = make(map[string]string)
 
     imports := new(bytes.Buffer)
     renderer := new(bytes.Buffer)
     uses := new(bytes.Buffer)
     funcs := new(bytes.Buffer)
+    ajxfuncs := new(bytes.Buffer)
 
-    regsearch := make(map[*regexp.Regexp]processor)
-    r1,_ := regexp.Compile("\\<\\?gofn\\s")
-    regsearch[r1] = processfn
-    r2,_ := regexp.Compile("\\<\\?go\\s")
-    regsearch[r2] = processgo
-    r3,_ := regexp.Compile("\\<\\?gouse\\s")
-    regsearch[r3] = processuse
-    r4,_:= regexp.Compile("\\<\\?goimp\\s")
-    regsearch[r4] = processimp
-
-    regend,_ := regexp.Compile("\\?\\>")
+    if r1 == nil {
+        r1,_ = regexp.Compile("\\<\\?gofn\\s")
+        regsearch[r1] = processfn
+        r2,_ := regexp.Compile("\\<\\?go\\s")
+        regsearch[r2] = processgo
+        r3,_ := regexp.Compile("\\<\\?gouse\\s")
+        regsearch[r3] = processuse
+        r4,_:= regexp.Compile("\\<\\?goimp\\s")
+        regsearch[r4] = processimp
+        r5, := regexp.Compile("\\<\\?go@fn\\s")
+        regsearch[r5] = processajxfn
+        regend,_ := regexp.Compile("\\?\\>")
+    }
 
     for last := 0; last < gokcodeLen; {
         slice := gokcode[last:]
@@ -61,6 +72,8 @@ func compile(gokcode string) (string, string) {
                     uses.WriteString(code)
                 case addfn:
                     funcs.WriteString(code)
+                case addUnknown:
+                    return "", "", "", errors.New(code)
             }
             last += end[1]
             break
@@ -134,6 +147,11 @@ func processimp(code string, lnoff int) (string, int) {
     return out.String(), addimports
 }
 
+func processqajxfn(code string, lnoff int) (string, int) {
+
+}
+
+
 func createEcho(code string, lnoff int) string {
     formatedStr := formateStr(code)
     if formatedStr != "" {
@@ -146,6 +164,7 @@ func formateStr(s string) string {
     if strings.TrimSpace(s) == "" {
         return ""
     }
+    s = strings.Replace(s, "\\", "\\\\", -1)
     s = strings.Replace(s, "\n", "\\n", -1)
     s = strings.Replace(s, "\t", "\\t", -1)
     s = strings.Replace(s, "\r", "\\r", -1)
