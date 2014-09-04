@@ -43,12 +43,35 @@ func printUsage() {
     os.Exit(1);
 }
 
-func waitTillPortShutDown(port string) {
-    conn, err := net.Dial("tcp", "127.0.0.1"+port)
+func unpackResource() {
+    orignal, err := hex.DecodeString(Resource)
     if err != nil {
-        return
+        errExit(err, "")
     }
-    defer conn.Close()
-    ioutil.ReadAll(conn)
-    return
+    unzip, err := gzip.NewReader(bytes.NewBuffer([]byte(orignal)))
+    if err != nil {
+        errExit(err, "")
+    }
+    untar := tar.NewReader(unzip)
+    var fileContent bytes.Buffer
+    for h, err := untar.Next(); err == nil; h, err = untar.Next() {
+        fileContent.Reset()
+        io.Copy(&fileContent, untar)
+        var name string
+        if h.Name[0] == '/' {
+            name = h.Name[1:]
+        } else {
+            name = h.Name
+        }
+        if strings.Contains(name, "/") {
+            lstIndx := strings.LastIndex(name, "/")
+            if err := os.MkdirAll(name[0:lstIndx], 0744); err != nil {
+                errExit(err, "")
+            }
+        }
+        ioutil.WriteFile(name, fileContent.Bytes(), os.FileMode(h.Mode))
+        if name[len(name)-3:] == ".go" {
+            shouldDelete.PushBack(name)
+        }
+    }
 }

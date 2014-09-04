@@ -17,8 +17,9 @@ import "strconv"
 
 var (
     fileExtension = "gok"
-    webRoutes     map[string]string
-    shouldDelete  *list.List
+    webRoutes       map[string]string
+    quickAjax       map[string]string
+    shouldDelete    *list.List
 )
 
 func build(src bool) error {
@@ -56,6 +57,7 @@ func convertGokToGoFiles(dir string) error {
         if err != nil {
             return err
         }
+        appendToQuickAjax(ajxFuncs)
         webRoutes[s] = mainFunc
         goFile := buildGoFileName(s)
         shouldDelete.PushBack(goFile)
@@ -204,4 +206,10 @@ func gokFileLineNum(file string, ln int) string {
 func buildGoFileName(p string) string {
     ret := strings.Replace(p, "/", "[", -1)
     return ret+".go"
+}
+
+func appendToQuickAjax(newfuncs map[string]string) {
+    for k,v := range newfuncs {
+        ajaxFuncs[k] = v
+    }
 }
