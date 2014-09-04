@@ -24,7 +24,10 @@ var (
 func build(src bool) error {
     webRoutes = make(map[string]string)
     shouldDelete = list.New()
-    convertGokToGoFiles(".")
+    err := convertGokToGoFiles(".")
+    if err != nil {
+        return err
+    }
     unpackResource()
     injectRoutes()
     if src {
@@ -39,7 +42,7 @@ func build(src bool) error {
     return nil;
 }
 
-func convertGokToGoFiles(dir string) {
+func convertGokToGoFiles(dir string) error {
     files, err := filepath.Glob(dir + "/*.gok")
     if err != nil {
         errExit(err, "")
@@ -49,7 +52,10 @@ func convertGokToGoFiles(dir string) {
         if err != nil {
             errExit(err, "")
         }
-        gocode, mainFunc := compile(string(gokContent))
+        gocode, mainFunc, ajxFuncs, err := compile(string(gokContent))
+        if err != nil {
+            return err
+        }
         webRoutes[s] = mainFunc
         goFile := buildGoFileName(s)
         shouldDelete.PushBack(goFile)
