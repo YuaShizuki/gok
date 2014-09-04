@@ -10,18 +10,19 @@ const(
     addrenderer = iota
     addimports = iota
     addajxfn = iota
+    addunknown = iota
 )
 type processor func(string, int)(string, int)
 
-var r1, r2, r3, r4, r5, regend *regexp.Regexp
-var goQuickAjaxFuncs map[string]string = nil
+var r1, r2, r3, r4, r5, r6, regend *regexp.Regexp
+var ajaxFuncs map[string]string = nil
 var regsearch map[*regexp.Regexp]processor = make(map[*regexp.Regexp]processor)
 
 func compile(gokcode string) (string, string, map[string]string, error) {
     gokcodeLen := len(gokcode)
-    //reset the map, mabe populated during previous runs
-    goQuickAjaxFuncs = nil
-    goQuickAjaxFuncs = make(map[string]string)
+    //reset the map, populated during previous runs
+    ajaxFuncs = nil
+    ajaxFuncs = make(map[string]string)
 
     imports := new(bytes.Buffer)
     renderer := new(bytes.Buffer)
@@ -32,15 +33,15 @@ func compile(gokcode string) (string, string, map[string]string, error) {
     if r1 == nil {
         r1,_ = regexp.Compile("\\<\\?gofn\\s")
         regsearch[r1] = processfn
-        r2,_ := regexp.Compile("\\<\\?go\\s")
+        r2,_ = regexp.Compile("\\<\\?go\\s")
         regsearch[r2] = processgo
-        r3,_ := regexp.Compile("\\<\\?gouse\\s")
+        r3,_ = regexp.Compile("\\<\\?gouse\\s")
         regsearch[r3] = processuse
-        r4,_:= regexp.Compile("\\<\\?goimp\\s")
+        r4,_ = regexp.Compile("\\<\\?goimp\\s")
         regsearch[r4] = processimp
-        r5, := regexp.Compile("\\<\\?go@fn\\s")
+        r5, = regexp.Compile("\\<\\?go@fn\\s")
         regsearch[r5] = processajxfn
-        regend,_ := regexp.Compile("\\?\\>")
+        regend,_ = regexp.Compile("\\?\\>")
     }
 
     for last := 0; last < gokcodeLen; {
@@ -62,7 +63,7 @@ func compile(gokcode string) (string, string, map[string]string, error) {
             }
             echo := createEcho(slice[:start[0]], lnoffset)
             renderer.WriteString(echo)
-            code, typ := v(slice[start[1]:end[0]],lnoffset)
+            code, typ := v(slice[start[1]:end[0]],lnoffset,)
             switch typ {
                 case addimports:
                     imports.WriteString(code)
@@ -74,7 +75,7 @@ func compile(gokcode string) (string, string, map[string]string, error) {
                     funcs.WriteString(code)
                 case addajxfn:
                     ajxfuncs.WriteString(code)
-                case addUnknown:
+                case addunknown:
                     return "", "", "", errors.New(code)
             }
             last += end[1]
@@ -149,8 +150,22 @@ func processimp(code string, lnoff int) (string, int) {
     return out.String(), addimports
 }
 
-func processqajxfn(code string, lnoff int) (string, int) {
-
+func processajxfn(code string, lnoff int) (string, int) {
+    if r6 == nil {
+        r6, _ = regexp.Compile("^\\s*[a-zA-Z0-9]+\\([a-zA-Z0-9]+\\s\\[\\]"+
+        "string\\)\\s\\(\\[\\]string[,]\\serror\\)\\s*\\{(.|\\s)*\\}$")
+    }
+    if !r6.Match(code) {
+        err := fmt.Sprintf("<?go@fn ?> inappropriate function on line %d",lnoff)
+        return err, addunknown
+    }
+    indx := strings.Index(code, "(")
+    if indx == -1 { return "fatal regexp failure", addunknown }
+    fnName := strings.TrimSpace(code[:indx])
+    newName := "func "+genRandName()
+    out := newName + code[indx:]
+    
+    return out, addajxfn
 }
 
 
