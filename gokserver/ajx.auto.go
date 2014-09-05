@@ -20,9 +20,9 @@ func handleIfQuickAjx(gok *Gok) bool {
     req := gok.Post("forgokqajxfn")
     result, err := fn(strings.Split(req,"[2577<--gokBoundry-->21501]"))
     if err != nil {
-        fmt.Fprintln(gok.w, "");
+        fmt.Fprintf(gok.w, "");
     } else {
-        fmt.Fprintln(gok.w, strings.Join(result, "[2577<--gokBoundry-->21501]"))
+        fmt.Fprintf(gok.w, strings.Join(result, "[2577<--gokBoundry-->21501]"))
     }
     return true
 }

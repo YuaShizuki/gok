@@ -159,7 +159,7 @@ func processajxfn(code string, lnoff int) (string, int) {
         "string\\)\\s\\(\\[\\]string[,]\\serror\\)\\s*\\{(.|\\s)*\\}$")
     }
     if !r6.Match([]byte(code)) {
-        err := fmt.Sprintf("<?go@fn ?> inappropriate function on line %d",lnoff)
+        err := fmt.Sprintf("go@fn inappropriate function on line %d",lnoff)
         return err, addunknown
     }
     indx := strings.Index(code, "(")

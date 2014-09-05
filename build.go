@@ -57,7 +57,7 @@ func convertGokToGoFiles(dir string) error {
         }
         gocode, mainFunc, ajxFuncs, err := compile(string(gokContent))
         if err != nil {
-            return err
+            return errors.New(s + " :"+err.Error())
         }
         appendToQuickAjax(ajxFuncs)
         webRoutes[s] = mainFunc
