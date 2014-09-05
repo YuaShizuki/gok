@@ -5,8 +5,12 @@ import "encoding/hex"
 import "math/rand"
 import "time"
 import "container/list"
-import "net"
 import "io/ioutil"
+import "compress/gzip"
+import "bytes"
+import "io"
+import "strings"
+import "archive/tar"
 
 func delFiles(l *list.List) {
     for e := l.Front(); e != nil; e = e.Next() {

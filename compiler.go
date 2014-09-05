@@ -3,6 +3,7 @@ import "fmt"
 import "regexp"
 import "strings"
 import "bytes"
+import "errors"
 
 const(
     addfn = iota
@@ -39,7 +40,7 @@ func compile(gokcode string) (string, string, map[string]string, error) {
         regsearch[r3] = processuse
         r4,_ = regexp.Compile("\\<\\?goimp\\s")
         regsearch[r4] = processimp
-        r5, = regexp.Compile("\\<\\?go@fn\\s")
+        r5,_ = regexp.Compile("\\<\\?go@fn\\s")
         regsearch[r5] = processajxfn
         regend,_ = regexp.Compile("\\?\\>")
     }
@@ -84,7 +85,8 @@ func compile(gokcode string) (string, string, map[string]string, error) {
     }
     rendererName := "Render"+genRandName()
     final := "package main\n"+imports.String()+uses.String()+funcs.String()+
-            "func "+rendererName+"(gok *Gok) {\n"+renderer.String()+"\n}\n"
+            ajxfuncs.String()+"func "+rendererName+"(gok *Gok) {\n"+
+            renderer.String()+"\n}\n"
     return final, rendererName, ajaxFuncs, nil
 }
 
@@ -151,21 +153,32 @@ func processimp(code string, lnoff int) (string, int) {
 }
 
 func processajxfn(code string, lnoff int) (string, int) {
+    var out bytes.Buffer
     if r6 == nil {
         r6, _ = regexp.Compile("^\\s*[a-zA-Z0-9]+\\([a-zA-Z0-9]+\\s\\[\\]"+
         "string\\)\\s\\(\\[\\]string[,]\\serror\\)\\s*\\{(.|\\s)*\\}$")
     }
-    if !r6.Match(code) {
+    if !r6.Match([]byte(code)) {
         err := fmt.Sprintf("<?go@fn ?> inappropriate function on line %d",lnoff)
         return err, addunknown
     }
     indx := strings.Index(code, "(")
     if indx == -1 { return "fatal regexp failure", addunknown }
     fnName := strings.TrimSpace(code[:indx])
-    newName := "func "+genRandName()
-    out := newName + code[indx:]
+    newName := "ajx"+genRandName()
+    //out := "func "+newName + code[indx:]
+    out.WriteString(fmt.Sprintf("//%d\nfunc %s",lnoff, newName))
+    lns := strings.Split(code[indx:], "\n")
+    out.WriteString(lns[0]+"\n")
+    if len(lns) > 1 {
+        for i,l := range lns[1:] {
+            out.WriteString(fmt.Sprintf("//%d\n", lnoff+i+1))
+            out.WriteString(strings.TrimSpace(l)+"\n")
+        }
+    }
+    out.WriteString("\n")
     ajaxFuncs[newName] = fnName
-    return out, addajxfn
+    return out.String(), addajxfn
 }
 
 

@@ -1,13 +1,8 @@
 package main
 
 import "fmt"
-import "os"
-import "io"
 import "io/ioutil"
 import "path/filepath"
-import "encoding/hex"
-import "compress/gzip"
-import "archive/tar"
 import "strings"
 import "bytes"
 import "os/exec"
@@ -24,6 +19,7 @@ var (
 
 func build(src bool) error {
     webRoutes = make(map[string]string)
+    quickAjax = make(map[string]string)
     shouldDelete = list.New()
     err := convertGokToGoFiles(".")
     if err != nil {
@@ -34,6 +30,8 @@ func build(src bool) error {
     if len(quickAjax) != 0 {
         buildGokJs(quickAjax)
         injectAjxRoutes(quickAjax)
+    } else {
+        fmt.Println("did not detect any quick ajx functions")
     }
     if src {
         return nil
@@ -74,6 +72,7 @@ func convertGokToGoFiles(dir string) error {
             }
         }
     }
+    return nil
 }
 
 func injectRoutes() {
@@ -181,6 +180,6 @@ func buildGoFileName(p string) string {
 
 func appendToQuickAjax(newfuncs map[string]string) {
     for k,v := range newfuncs {
-        ajaxFuncs[k] = v
+        quickAjax[k] = v
     }
 }

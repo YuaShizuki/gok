@@ -1,5 +1,8 @@
 package main
 
+import "fmt"
+import "strings"
+
 type gok_ajxProcessor func([]string)([]string, error)
 
 var gok_ajxRoutes map[string]gok_ajxProcessor = map[string]gok_ajxProcessor {
@@ -15,10 +18,7 @@ func handleIfQuickAjx(gok *Gok) bool {
         return false
     }
     req := gok.Post("forgokqajxfn")
-    if content == "" {
-        return false
-    }
-    result, err := fn(strings.Split("[2577<--gokBoundry-->21501]"))
+    result, err := fn(strings.Split(req,"[2577<--gokBoundry-->21501]"))
     if err != nil {
         fmt.Fprintln(gok.w, "");
     } else {

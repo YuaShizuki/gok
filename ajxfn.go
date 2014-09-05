@@ -3,6 +3,7 @@ import "strings"
 import "fmt"
 import "bytes"
 import "io/ioutil"
+import "errors"
 
 var gokJsCode string = `
 function Actual(path, args) {
@@ -12,24 +13,23 @@ function Actual(path, args) {
         if ((typeof args[i] == "number") || (typeof args[i] == "string"))
             pstData += String(args[i]) + boundry 
     }
-    if (pstData != "") {
-        xhr = new XMLHttpRequest()
-        xhr.open("POST", "/"+path, false)
-        xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded")
-        xhr.send("forgokqajxfn="+pstData)
-        return xhr.response.split("[2577<--gokBoundry-->21501]")
-    }
+    xhr = new XMLHttpRequest()
+    xhr.open("POST", "/"+path, false)
+    xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded")
+    xhr.send("forgokqajxfn="+pstData)
+    return xhr.response.split("[2577<--gokBoundry-->21501]")
 }
 function Gok() {
     this.init = true
 }
 `
 
-var protJsCode string =
+var protoJsCode string =
 `Gok.prototype.%s = function(){ return Actual("%s", arguments) }
 `
 
 func buildGokJs(ajxfn map[string]string) {
+    fmt.Println("building gok.js")
     var out bytes.Buffer
     out.WriteString(gokJsCode)
     for k,v := range ajxfn {
@@ -39,7 +39,7 @@ func buildGokJs(ajxfn map[string]string) {
     ioutil.WriteFile("gok.js", out.Bytes(), 0644)
 }
 
-func injectAjxRoutes(ajxroutes map[string]string) {
+func injectAjxRoutes(ajxr map[string]string) {
     var out bytes.Buffer
     file, err := ioutil.ReadFile("ajx.auto.go")
     if err != nil {
@@ -50,11 +50,11 @@ func injectAjxRoutes(ajxroutes map[string]string) {
         errExit(errors.New("corrupt ajx.auot.go file in resource"), "")
     }
     out.WriteString(ajxroutes[0])
-    for k, v := range ajxroutes {
+    for k,_ := range ajxr {
         out.WriteString("\""+k+"\":" + k + ",\n")
     }
     out.WriteString(ajxroutes[1])
-    err = ioutil.WriteFile("ajx.auot.go", out.Bytes(), 0644)
+    err = ioutil.WriteFile("ajx.auto.go", out.Bytes(), 0644)
     if err != nil {
         errExit(err, "")
     }
