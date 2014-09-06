@@ -14,10 +14,12 @@ function Actual(path, args) {
             pstData += String(args[i]) + boundry 
     }
     xhr = new XMLHttpRequest()
-    xhr.open("POST", "/"+path, false)
+    xhr.onload = function() { 
+        args[args.length - 1](xhr.response.split("[2577<--gokBoundry-->21501]")) 
+    }
+    xhr.open("POST", "/"+path, true)
     xhr.setRequestHeader("Content-type","application/x-www-form-urlencoded")
     xhr.send("forgokqajxfn="+pstData)
-    return xhr.response.split("[2577<--gokBoundry-->21501]")
 }
 function Gok() {
     this.init = true
@@ -25,7 +27,7 @@ function Gok() {
 `
 
 var protoJsCode string =
-`Gok.prototype.%s = function(){ return Actual("%s", arguments) }
+`Gok.prototype.%s = function(){ Actual("%s", arguments) }
 `
 
 func buildGokJs(ajxfn map[string]string) {
