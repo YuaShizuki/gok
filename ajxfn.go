@@ -31,7 +31,6 @@ var protoJsCode string =
 `
 
 func buildGokJs(ajxfn map[string]string) {
-    fmt.Println("building gok.js")
     var out bytes.Buffer
     out.WriteString(gokJsCode)
     for k,v := range ajxfn {

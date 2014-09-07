@@ -102,7 +102,7 @@ func startNotifier(dir string, end chan bool) {
     for ;; {
         select {
             case event := <-watch.Event:
-                if goorgok.Match([]byte(event.Name)) {
+                if goorgok.Match([]byte(event.Name)) || isDirectory(event.Name) {
                     if time.Since(lastUpdate) < (1000 * time.Millisecond) {
                         continue
                     }
