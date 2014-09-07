@@ -71,14 +71,14 @@ func controllerStart() {
     if err != nil {
         return
     }
-    go startNotifier()
+    go startNotifier(".", make(chan bool))
     ioutil.ReadAll(controllerConn)
     switchOffController()
 }
 /*- End -*/
 
 
-func startNotifier() {
+func startNotifier(dir string, end chan bool) {
     lastUpdate := time.Now()
     goorgok,_ := regexp.Compile("^([^.]*\\.go|[^.]*\\.gok)$")
     watch, err := fsnotify.NewWatcher()
@@ -86,7 +86,19 @@ func startNotifier() {
         fmt.Println(err)
         os.Exit(1)
     }
-    watch.Watch(".")
+    dirNotifiers := make([](chan bool),0,10)
+    files, err := ioutil.ReadDir(dir)
+    if err != nil {
+        errExit(err, "")
+    }
+    for _, f := range files {
+        if f.IsDir() {
+            lenD := len(dirNotifiers)
+            dirNotifiers = append(dirNotifiers, make(chan bool))
+            startNotifier(dir+"/"+f.Name(), dirNotifiers[lenD])
+        }
+    }
+    watch.Watch(dir)
     for ;; {
         select {
             case event := <-watch.Event:
@@ -106,8 +118,21 @@ func startNotifier() {
                     } else {
                         fmt.Printf("server binary build successful\n")
                         watch.Close()
+                        for _, c := range dirNotifiers {
+                            c <- true
+                            close(c)
+                        }
                         return
                     }
+                }
+            case shouldEnd := <-end:
+                if shouldEnd {
+                    watch.Close()
+                    for _, c := range dirNotifiers {
+                            c <- true
+                            close(c)
+                    }
+                    return
                 }
         }
     }
