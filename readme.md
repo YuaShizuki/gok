@@ -18,9 +18,10 @@ installation
 
 gok tags
 ---------------
-`<?go ?>` can scope any valid go code. Code scoped in this tag
-executes inside a render function. 
+*`<?go ?>`
+	can scope any valid go code. Code scoped in this tag
+	executes inside a render function. 
 
-`<?gofn functionName(){ }?>` allows you to define a global function
- <font color='red'>thats</font>accessible by all .gok scripts
+*`<?gofn functionName(){ }?>`
+	allows you to define a global function thats accessible by all ".gok" scripts
 
