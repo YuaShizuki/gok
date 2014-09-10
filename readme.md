@@ -22,5 +22,5 @@ gok tags
 executes inside a render function. 
 
 `<?gofn functionName(){ }?>` allows you to define a global function
-thats accessible by all .gok scripts
+ <font color='red'>thats</font>accessible by all .gok scripts
 
