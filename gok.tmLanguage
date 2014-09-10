@@ -1,0 +1,230 @@
+// [PackageDev] target_format: plist, ext: tmLanguage
+{ "name": "gok",
+  "scopeName": "source.gok",
+  "fileTypes": ["gok"],
+  "uuid": "8d733cc8-db75-4be0-b822-e4bfd6fa2afc",
+  "patterns": [
+    {
+    	"begin":"(<\\?go)",
+    	"end":"(\\?>)",
+      "beginCaptures":{
+          "1":{"name":"constant.language.gok"}
+      },
+      "endCaptures":{
+        "1":{"name":"constant.language.gok"}
+      },
+      "patterns":[
+        {
+          "match":"(imp|@fn|use|fn)\\b",
+          "name":"keyword.other2.gok"
+        },
+        {
+          "begin": "/\\*",
+          "end": "\\*/",
+          "name": "comment.block.gok"
+        },
+        {
+          "begin": "//",
+          "end": "\\z",
+          "name": "comment.line.double-slash.gok"
+        },
+        {
+          "begin": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.gok"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.gok"
+            }
+          },
+          "name": "string.quoted.double.gok",
+          "patterns": [
+            {
+              "include": "#string_placeholder"
+            },
+            {
+              "include": "#string_escaped_char"
+            }
+          ]
+        },
+        {
+          "begin": "`",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.gok"
+            }
+          },
+          "end": "`",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.gok"
+            }
+          },
+          "name": "string.quoted.raw.gok",
+          "patterns": [
+            {
+              "include": "#string_placeholder"
+            },
+            {
+              "include": "source.goktemplate"
+            }
+          ]
+        },
+        {
+          "match": "\\b(true|false|nil|iota)\\b",
+          "name": "constant.language.gok"
+        },
+        {
+          "match": "\\b((\\d+\\.(\\d+)?([eE][+-]?\\d+)?|\\d+[eE][+-]?\\d+|\\.\\d+([eE][+-]?\\d+)?)i?)\\b",
+          "name": "constant.numeric.floating-point.gok"
+        },
+        {
+          "match": "\\b(\\d+i|0[xX][0-9A-Fa-f]+|0[0-7]*|[1-9][0-9]*)\\b",
+          "name": "constant.numeric.integer.gok"
+        },
+        {
+          "name": "constant.other.rune.gok",
+          "match": "'(?:[^'\\\\]|\\\\(?:\\\\|[abfnrtv']|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{3}))'"
+        },
+        {
+          "match": "\\b(bool|byte|complex(64|128)|error|float(32|64)|rune|string|u?int(8|16|32|64)?|uintptr)\\b",
+          "name": "storage.type.gok"
+        },
+        {
+          "comment": "A subset of keyword.other.gok for flow control keywords.",
+          "match": "\\b(break|case|continue|default|defer|else|for|go|goto|if|range|return|select|switch)\\b",
+          "name": "keyword.control.gok"
+        },
+        {
+          "match": "\\b(break|gok|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\\b",
+          "name": "keyword.other.gok"
+        },
+        {
+          "captures": {
+            "0": {
+              "name": "variable.other.gok"
+            },
+            "1": {
+              "name": "keyword.operator.initialize.gok"
+            }
+          },
+          "comment": "This matches the 'x := 0' style of variable declaration.",
+          "match": "(?:[[:alpha:]_][[:alnum:]_]*)(?:,\\s+[[:alpha:]_][[:alnum:]_]*)*\\s*(:=)",
+          "name": "meta.initialization.short.gok"
+        },
+        {
+          "match": "(?<=(\\A(func)|...\\))\\s)\\b(\\w+)\\b(?=\\()",
+          "name": "entity.name.function.gok"
+        },
+        {
+          "match":"(?<=(fn)\\s)\\b(\\w+)\\b(?=\\()",
+          "name":"entity.name.function.gok"
+        },
+        {
+          "match": "(?<=(\\s(func)|....\\))\\s)\\b(\\w+)\\b(?=\\()",
+          "name": "entity.name.function.gok"
+        },
+        {
+          "match": "(?<=\\Atype\\s)\\b(\\w+)\\b",
+          "name": "entity.name.type.gok"
+        },
+        {
+          "match": "(?<=\\stype\\s)\\b(\\w+)\\b",
+          "name": "entity.name.type.gok"
+        },
+        {
+          "match": "\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b",
+          "name": "support.function.builtin.gok"
+        },
+        {
+          "match": "\\b(\\w+)\\b(?=\\()",
+          "name": "support.function.gok"
+        },
+        {
+          "match": "(<-)",
+          "name": "keyword.operator.channel.gok"
+        },
+        {
+          "match": "(==|!=|<|<=|>|>=)",
+          "name": "keyword.operator.comparison.gok"
+        },
+        {
+          "match": "(&&|[|]{2}|!)",
+          "name": "keyword.operator.logical.gok"
+        },
+        {
+          "match": "([+]{2})",
+          "name": "keyword.operator.increment.gok"
+        },
+        {
+          "match": "(--)",
+          "name": "keyword.decrement.gok"
+        },
+        {
+          "match": "(=|(?:[+]|-|[|]|^|[*]|/|%|<<|>>|&|&^)=)",
+          "name": "keyword.operator.assignment.gok"
+        },
+        {
+          "match": "([+]|-|[*]|/|%|&|[|]|^|&^|<<|>>)",
+          "name": "keyword.operator.arithmetic.gok"
+        },
+        {
+          "match": "(;)",
+          "name": "keyword.operator.semi-colon.gok"
+        },
+        {
+          "match": "(,)",
+          "name": "punctuation.definition.comma.gok"
+        },
+        {
+          "match": "([.])",
+          "name": "punctuation.definition.dot.gok"
+        },
+        {
+          "match": "(:)",
+          "name": "punctuation.definition.colon.gok"
+        },
+        {
+          "match": "(\\[|\\]|{|}|\\(|\\))",
+          "name": "punctuation.definition.bracket.gok"
+        }]
+    },
+    {
+      "name":"html.gok",
+      "begin":"()(?=(<[^?]))",
+      "end":"(?<=([^?]>))()",
+      "patterns": [
+          { "match":"(\\w+)(?=([^=]))", "name":"keyword.gok"},
+          { "match":"(\\s\\w+)(?=([=]))", "name":"entity.name.function.gok"},
+          {
+            "begin": "\"",
+            "beginCaptures": {
+              "0": {
+                "name": "punctuation.definition.string.begin.gok"
+              }
+            },
+            "end": "\"",
+            "endCaptures": {
+              "0": {
+                "name": "punctuation.definition.string.end.gok"
+              }
+            },
+            "name": "string.quoted.double.gok",
+            "patterns": [
+                {"match":".", "name":"string.gok"}
+            ]
+        }      
+      ]
+    },
+    { "begin":"(?<=(<script>))()",
+      "end":"()((?=(<\\/script>))|(?=(<\\?go)))",
+      "name":"javascript.gok",
+      "patterns": [
+          {"include":"source.js"}
+      ]
+    }]
+}
