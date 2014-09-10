@@ -1,230 +1,386 @@
-// [PackageDev] target_format: plist, ext: tmLanguage
-{ "name": "gok",
-  "scopeName": "source.gok",
-  "fileTypes": ["gok"],
-  "uuid": "8d733cc8-db75-4be0-b822-e4bfd6fa2afc",
-  "patterns": [
-    {
-    	"begin":"(<\\?go)",
-    	"end":"(\\?>)",
-      "beginCaptures":{
-          "1":{"name":"constant.language.gok"}
-      },
-      "endCaptures":{
-        "1":{"name":"constant.language.gok"}
-      },
-      "patterns":[
-        {
-          "match":"(imp|@fn|use|fn)\\b",
-          "name":"keyword.other2.gok"
-        },
-        {
-          "begin": "/\\*",
-          "end": "\\*/",
-          "name": "comment.block.gok"
-        },
-        {
-          "begin": "//",
-          "end": "\\z",
-          "name": "comment.line.double-slash.gok"
-        },
-        {
-          "begin": "\"",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.begin.gok"
-            }
-          },
-          "end": "\"",
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.end.gok"
-            }
-          },
-          "name": "string.quoted.double.gok",
-          "patterns": [
-            {
-              "include": "#string_placeholder"
-            },
-            {
-              "include": "#string_escaped_char"
-            }
-          ]
-        },
-        {
-          "begin": "`",
-          "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.begin.gok"
-            }
-          },
-          "end": "`",
-          "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.end.gok"
-            }
-          },
-          "name": "string.quoted.raw.gok",
-          "patterns": [
-            {
-              "include": "#string_placeholder"
-            },
-            {
-              "include": "source.goktemplate"
-            }
-          ]
-        },
-        {
-          "match": "\\b(true|false|nil|iota)\\b",
-          "name": "constant.language.gok"
-        },
-        {
-          "match": "\\b((\\d+\\.(\\d+)?([eE][+-]?\\d+)?|\\d+[eE][+-]?\\d+|\\.\\d+([eE][+-]?\\d+)?)i?)\\b",
-          "name": "constant.numeric.floating-point.gok"
-        },
-        {
-          "match": "\\b(\\d+i|0[xX][0-9A-Fa-f]+|0[0-7]*|[1-9][0-9]*)\\b",
-          "name": "constant.numeric.integer.gok"
-        },
-        {
-          "name": "constant.other.rune.gok",
-          "match": "'(?:[^'\\\\]|\\\\(?:\\\\|[abfnrtv']|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{3}))'"
-        },
-        {
-          "match": "\\b(bool|byte|complex(64|128)|error|float(32|64)|rune|string|u?int(8|16|32|64)?|uintptr)\\b",
-          "name": "storage.type.gok"
-        },
-        {
-          "comment": "A subset of keyword.other.gok for flow control keywords.",
-          "match": "\\b(break|case|continue|default|defer|else|for|go|goto|if|range|return|select|switch)\\b",
-          "name": "keyword.control.gok"
-        },
-        {
-          "match": "\\b(break|gok|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\\b",
-          "name": "keyword.other.gok"
-        },
-        {
-          "captures": {
-            "0": {
-              "name": "variable.other.gok"
-            },
-            "1": {
-              "name": "keyword.operator.initialize.gok"
-            }
-          },
-          "comment": "This matches the 'x := 0' style of variable declaration.",
-          "match": "(?:[[:alpha:]_][[:alnum:]_]*)(?:,\\s+[[:alpha:]_][[:alnum:]_]*)*\\s*(:=)",
-          "name": "meta.initialization.short.gok"
-        },
-        {
-          "match": "(?<=(\\A(func)|...\\))\\s)\\b(\\w+)\\b(?=\\()",
-          "name": "entity.name.function.gok"
-        },
-        {
-          "match":"(?<=(fn)\\s)\\b(\\w+)\\b(?=\\()",
-          "name":"entity.name.function.gok"
-        },
-        {
-          "match": "(?<=(\\s(func)|....\\))\\s)\\b(\\w+)\\b(?=\\()",
-          "name": "entity.name.function.gok"
-        },
-        {
-          "match": "(?<=\\Atype\\s)\\b(\\w+)\\b",
-          "name": "entity.name.type.gok"
-        },
-        {
-          "match": "(?<=\\stype\\s)\\b(\\w+)\\b",
-          "name": "entity.name.type.gok"
-        },
-        {
-          "match": "\\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\\b",
-          "name": "support.function.builtin.gok"
-        },
-        {
-          "match": "\\b(\\w+)\\b(?=\\()",
-          "name": "support.function.gok"
-        },
-        {
-          "match": "(<-)",
-          "name": "keyword.operator.channel.gok"
-        },
-        {
-          "match": "(==|!=|<|<=|>|>=)",
-          "name": "keyword.operator.comparison.gok"
-        },
-        {
-          "match": "(&&|[|]{2}|!)",
-          "name": "keyword.operator.logical.gok"
-        },
-        {
-          "match": "([+]{2})",
-          "name": "keyword.operator.increment.gok"
-        },
-        {
-          "match": "(--)",
-          "name": "keyword.decrement.gok"
-        },
-        {
-          "match": "(=|(?:[+]|-|[|]|^|[*]|/|%|<<|>>|&|&^)=)",
-          "name": "keyword.operator.assignment.gok"
-        },
-        {
-          "match": "([+]|-|[*]|/|%|&|[|]|^|&^|<<|>>)",
-          "name": "keyword.operator.arithmetic.gok"
-        },
-        {
-          "match": "(;)",
-          "name": "keyword.operator.semi-colon.gok"
-        },
-        {
-          "match": "(,)",
-          "name": "punctuation.definition.comma.gok"
-        },
-        {
-          "match": "([.])",
-          "name": "punctuation.definition.dot.gok"
-        },
-        {
-          "match": "(:)",
-          "name": "punctuation.definition.colon.gok"
-        },
-        {
-          "match": "(\\[|\\]|{|}|\\(|\\))",
-          "name": "punctuation.definition.bracket.gok"
-        }]
-    },
-    {
-      "name":"html.gok",
-      "begin":"()(?=(<[^?]))",
-      "end":"(?<=([^?]>))()",
-      "patterns": [
-          { "match":"(\\w+)(?=([^=]))", "name":"keyword.gok"},
-          { "match":"(\\s\\w+)(?=([=]))", "name":"entity.name.function.gok"},
-          {
-            "begin": "\"",
-            "beginCaptures": {
-              "0": {
-                "name": "punctuation.definition.string.begin.gok"
-              }
-            },
-            "end": "\"",
-            "endCaptures": {
-              "0": {
-                "name": "punctuation.definition.string.end.gok"
-              }
-            },
-            "name": "string.quoted.double.gok",
-            "patterns": [
-                {"match":".", "name":"string.gok"}
-            ]
-        }      
-      ]
-    },
-    { "begin":"(?<=(<script>))()",
-      "end":"()((?=(<\\/script>))|(?=(<\\?go)))",
-      "name":"javascript.gok",
-      "patterns": [
-          {"include":"source.js"}
-      ]
-    }]
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>fileTypes</key>
+	<array>
+		<string>gok</string>
+	</array>
+	<key>name</key>
+	<string>gok</string>
+	<key>patterns</key>
+	<array>
+		<dict>
+			<key>begin</key>
+			<string>(&lt;\?go)</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>constant.language.gok</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>(\?&gt;)</string>
+			<key>endCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>constant.language.gok</string>
+				</dict>
+			</dict>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>(imp|@fn|use|fn)\b</string>
+					<key>name</key>
+					<string>keyword.other2.gok</string>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>/\*</string>
+					<key>end</key>
+					<string>\*/</string>
+					<key>name</key>
+					<string>comment.block.gok</string>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>//</string>
+					<key>end</key>
+					<string>\z</string>
+					<key>name</key>
+					<string>comment.line.double-slash.gok</string>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>"</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.begin.gok</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>"</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.end.gok</string>
+						</dict>
+					</dict>
+					<key>name</key>
+					<string>string.quoted.double.gok</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#string_placeholder</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>#string_escaped_char</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>`</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.begin.gok</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>`</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.end.gok</string>
+						</dict>
+					</dict>
+					<key>name</key>
+					<string>string.quoted.raw.gok</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>include</key>
+							<string>#string_placeholder</string>
+						</dict>
+						<dict>
+							<key>include</key>
+							<string>source.goktemplate</string>
+						</dict>
+					</array>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b(true|false|nil|iota)\b</string>
+					<key>name</key>
+					<string>constant.language.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b((\d+\.(\d+)?([eE][+-]?\d+)?|\d+[eE][+-]?\d+|\.\d+([eE][+-]?\d+)?)i?)\b</string>
+					<key>name</key>
+					<string>constant.numeric.floating-point.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b(\d+i|0[xX][0-9A-Fa-f]+|0[0-7]*|[1-9][0-9]*)\b</string>
+					<key>name</key>
+					<string>constant.numeric.integer.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>'(?:[^'\\]|\\(?:\\|[abfnrtv']|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{3}))'</string>
+					<key>name</key>
+					<string>constant.other.rune.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b(bool|byte|complex(64|128)|error|float(32|64)|rune|string|u?int(8|16|32|64)?|uintptr)\b</string>
+					<key>name</key>
+					<string>storage.type.gok</string>
+				</dict>
+				<dict>
+					<key>comment</key>
+					<string>A subset of keyword.other.gok for flow control keywords.</string>
+					<key>match</key>
+					<string>\b(break|case|continue|default|defer|else|for|go|goto|if|range|return|select|switch)\b</string>
+					<key>name</key>
+					<string>keyword.control.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b(break|gok|case|chan|const|continue|default|defer|else|fallthrough|for|func|go|goto|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b</string>
+					<key>name</key>
+					<string>keyword.other.gok</string>
+				</dict>
+				<dict>
+					<key>captures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>variable.other.gok</string>
+						</dict>
+						<key>1</key>
+						<dict>
+							<key>name</key>
+							<string>keyword.operator.initialize.gok</string>
+						</dict>
+					</dict>
+					<key>comment</key>
+					<string>This matches the 'x := 0' style of variable declaration.</string>
+					<key>match</key>
+					<string>(?:[[:alpha:]_][[:alnum:]_]*)(?:,\s+[[:alpha:]_][[:alnum:]_]*)*\s*(:=)</string>
+					<key>name</key>
+					<string>meta.initialization.short.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?&lt;=(\A(func)|...\))\s)\b(\w+)\b(?=\()</string>
+					<key>name</key>
+					<string>entity.name.function.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?&lt;=(fn)\s)\b(\w+)\b(?=\()</string>
+					<key>name</key>
+					<string>entity.name.function.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?&lt;=(\s(func)|....\))\s)\b(\w+)\b(?=\()</string>
+					<key>name</key>
+					<string>entity.name.function.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?&lt;=\Atype\s)\b(\w+)\b</string>
+					<key>name</key>
+					<string>entity.name.type.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(?&lt;=\stype\s)\b(\w+)\b</string>
+					<key>name</key>
+					<string>entity.name.type.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b(append|cap|close|complex|copy|delete|imag|len|make|new|panic|print|println|real|recover)\b</string>
+					<key>name</key>
+					<string>support.function.builtin.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>\b(\w+)\b(?=\()</string>
+					<key>name</key>
+					<string>support.function.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(&lt;-)</string>
+					<key>name</key>
+					<string>keyword.operator.channel.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(==|!=|&lt;|&lt;=|&gt;|&gt;=)</string>
+					<key>name</key>
+					<string>keyword.operator.comparison.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(&amp;&amp;|[|]{2}|!)</string>
+					<key>name</key>
+					<string>keyword.operator.logical.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>([+]{2})</string>
+					<key>name</key>
+					<string>keyword.operator.increment.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(--)</string>
+					<key>name</key>
+					<string>keyword.decrement.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(=|(?:[+]|-|[|]|^|[*]|/|%|&lt;&lt;|&gt;&gt;|&amp;|&amp;^)=)</string>
+					<key>name</key>
+					<string>keyword.operator.assignment.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>([+]|-|[*]|/|%|&amp;|[|]|^|&amp;^|&lt;&lt;|&gt;&gt;)</string>
+					<key>name</key>
+					<string>keyword.operator.arithmetic.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(;)</string>
+					<key>name</key>
+					<string>keyword.operator.semi-colon.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(,)</string>
+					<key>name</key>
+					<string>punctuation.definition.comma.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>([.])</string>
+					<key>name</key>
+					<string>punctuation.definition.dot.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(:)</string>
+					<key>name</key>
+					<string>punctuation.definition.colon.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(\[|\]|{|}|\(|\))</string>
+					<key>name</key>
+					<string>punctuation.definition.bracket.gok</string>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>()(?=(&lt;[^?]))</string>
+			<key>end</key>
+			<string>(?&lt;=([^?]&gt;))()</string>
+			<key>name</key>
+			<string>html.gok</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>match</key>
+					<string>(\w+)(?=([^=]))</string>
+					<key>name</key>
+					<string>keyword.gok</string>
+				</dict>
+				<dict>
+					<key>match</key>
+					<string>(\s\w+)(?=([=]))</string>
+					<key>name</key>
+					<string>entity.name.function.gok</string>
+				</dict>
+				<dict>
+					<key>begin</key>
+					<string>"</string>
+					<key>beginCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.begin.gok</string>
+						</dict>
+					</dict>
+					<key>end</key>
+					<string>"</string>
+					<key>endCaptures</key>
+					<dict>
+						<key>0</key>
+						<dict>
+							<key>name</key>
+							<string>punctuation.definition.string.end.gok</string>
+						</dict>
+					</dict>
+					<key>name</key>
+					<string>string.quoted.double.gok</string>
+					<key>patterns</key>
+					<array>
+						<dict>
+							<key>match</key>
+							<string>.</string>
+							<key>name</key>
+							<string>string.gok</string>
+						</dict>
+					</array>
+				</dict>
+			</array>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>(?&lt;=(&lt;script&gt;))()</string>
+			<key>end</key>
+			<string>()((?=(&lt;\/script&gt;))|(?=(&lt;\?go)))</string>
+			<key>name</key>
+			<string>javascript.gok</string>
+			<key>patterns</key>
+			<array>
+				<dict>
+					<key>include</key>
+					<string>source.js</string>
+				</dict>
+			</array>
+		</dict>
+	</array>
+	<key>scopeName</key>
+	<string>source.gok</string>
+	<key>uuid</key>
+	<string>8d733cc8-db75-4be0-b822-e4bfd6fa2afc</string>
+</dict>
+</plist>
