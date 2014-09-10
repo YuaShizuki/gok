@@ -11,4 +11,8 @@ this is my creation to build web apps in go, php style.
 	</body>
 </html>
 ```
+everything between `<?go` `?>` can be valid go code
 
+installation
+============
+`go get https://github.com/YuaShizuki/gok.git`
