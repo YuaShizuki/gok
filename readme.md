@@ -214,9 +214,6 @@ API:
 Sublime text syntax:
 --------------------
 To get syntax higlighting for sublime text, move `gok.tmLanguage` to sublime text data directory.     
-*	windows:     
-		 `%APPDATA%\Sublime Text 3\Package\User\`    
-*	osx:    
-		` ~/Library/Application Support/Sublime Text 3/Package/User`     
-*	linux:     
-		`~/.config/sublime-text-3/Package/User`   
+*	windows: `%APPDATA%\Sublime Text 3\Package\User\`    
+*	osx:` ~/Library/Application Support/Sublime Text 3/Package/User`     
+*	linux:`~/.config/sublime-text-3/Package/User`   

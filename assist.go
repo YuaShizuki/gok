@@ -42,8 +42,7 @@ func printUsage() {
     fmt.Println("#useage");
     fmt.Println("   $gok run");
     fmt.Println("   $gok build");
-    fmt.Println("   $gok src");
-    fmt.Println("   $gok api\n");
+    fmt.Println("   $gok src\n");
     os.Exit(1);
 }
 
