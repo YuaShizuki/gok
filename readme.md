@@ -41,8 +41,9 @@ gok tags
 				...
 	```
 4. *`<?gouse ?>`*   
-	gouse tag allows to define global variables, functions         
-	```html
+	gouse tag allows to define global variables, functions   
+	      
+	```text
 		<?gouse
 			type nstring string 
 			var x nstring = "Hello World"
