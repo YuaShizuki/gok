@@ -83,12 +83,12 @@ commands:
 	converts .gok file to valid go files and them compiles them to the final executable.
 
 2. **`$gok run`**    
-	gok run builds the executable and runs it, any new changes made to the source
-	would update the the server executable and restart it.
+	gok run builds the executable and then runs it, any new changes made to the source
+	would update the executable, hence restart it.
 
 3. **`$gok src`**    
 	src converts .gok files to .go files, running `$go build` in this directory
-	would result in the final server executable.
+	would result in the final executable.
 
 API:
 ----
