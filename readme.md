@@ -66,7 +66,7 @@ gok tags:
 		<?go@fn Swap(args []string) ([]string, error) {
 			return []string{args[1], args[0]}, nil
 		}?>
-		<script src="gok.js"></script>
+		<script src="/gok.js"></script>
 		<script>
 			function callback(response) {
 				console.log(response) //prints => ["Hello World", "1"]

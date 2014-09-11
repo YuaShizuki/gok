@@ -8,6 +8,9 @@ import "os"
 import "io"
 import "bytes"
 
+
+
+//core struct encapsulates the http.Request and http.ResponseWriter 
 type Gok struct {
     w http.ResponseWriter
     r *http.Request
@@ -17,35 +20,44 @@ type Gok struct {
     shouldRedirect bool
 };
 
+//equivalent to php `echo`, echo accepts any type of parameters
 func (self *Gok) Echo(a ...interface{}) {
     if self.response != nil {
         fmt.Fprint(self.response, a...)
     }
 }
 
+//redirects the request to a new url 
 func (self *Gok) Redirect(newUrl string) {
     self.shouldRedirect = true
     self.Header("Location:"+newUrl)
     self.w.WriteHeader(http.StatusMovedPermanently)
 }
 
+//Die sends the param msg as error, and undoes everything echoed so far.
 func (self *Gok) Die(msg string) {
     self.response.Reset()
     self.response = nil
     self.deadMsg = msg
 }
 
-/*- >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> $_SERVER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<< -*/
+//=>                    PHP equivalent of $_SERVER[] functions.
+//returns the current request url without the leading `/`
 func (self *Gok) ServerSelf() string {
     return self.r.URL.Path[1:]
 }
+
+//user agent
 func (self *Gok) ServerHttpUserAgent() string {
     return self.r.Header.Get("User-Agent")
 }
+
+//http referer
 func (self *Gok) ServerHttpReferer() string {
     return self.r.Referer()
 }
 
+//if request is http
 func (self *Gok) ServerHttps() bool {
     return self.r.URL.Scheme == "https"
 }
