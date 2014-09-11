@@ -18,6 +18,7 @@ installation:
 	go get https://github.com/YuaShizuki/gok.git
 	echo "PATH=$PATH:$GOPATH/bin" >> ~/.bash_profile
 ```
+the last command makes sure that $GOPATH/bin is in your standard path
 
 gok tags:
 ---------
