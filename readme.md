@@ -87,7 +87,7 @@ commands:
 	would update the the server executable and restart it.
 
 3. **`$gok src`**    
-	src converts .gok files to genrated .go files, running `$go build` in this directory
+	src converts .gok files to .go files, running `$go build` in this directory
 	would result in the final server executable.
 
 API:
