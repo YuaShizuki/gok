@@ -30,8 +30,6 @@ func build(src bool) error {
     if len(quickAjax) != 0 {
         buildGokJs(quickAjax)
         injectAjxRoutes(quickAjax)
-    } else {
-        fmt.Println("did not detect any quick ajx functions")
     }
     if src {
         return nil

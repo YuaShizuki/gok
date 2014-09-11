@@ -1,6 +1,6 @@
 package main
-import "strings"
 import "fmt"
+import "strings"
 import "bytes"
 import "io/ioutil"
 import "errors"
