@@ -1,0 +1,33 @@
+<?goimp 
+    "container/list"
+    "fmt"
+?>
+<?gouse
+    type Message struct {
+        user string
+        msg string
+    }
+    var listeners *list.List = list.New()
+?>
+<?go
+    if (gok.Post("message") != "") && (gok.Cookie("tempUserName") != "") {
+        elem := new(Message)
+        elem.user = gok.Cookie("tempUserName")
+        elem.msg = gok.Post("message")
+        for e := listeners.Front(); e != nil; e = e.Next() {
+            listener := e.Value.(chan *Message)    
+            listener <- elem
+        }
+    }
+    fmt.Println("recived a new message!")
+    gok.Header("Connection: close")
+    gok.Echo("OK")
+?>
+<?go@fn getLatestMessage(args []string) ([]string, error) {
+    cmsg := make(chan *Message)
+    elm := listeners.PushBack(cmsg) 
+    newMsg := <-cmsg
+    listeners.Remove(elm)
+    close(cmsg)
+    return []string{newMsg.user, newMsg.msg}, nil
+}?>

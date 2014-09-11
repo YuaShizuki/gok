@@ -206,6 +206,16 @@ API:
 		// http.ResponseWriter for gok instance
 		func (self *Gok) ResponseWriter() http.ResponseWriter { ... }
 		
-		// *http.Request for gok object
+		// *http.Request for gok instance
 		func (self *Gok) HttpRequest() *http.Request { ... }
 	```
+
+Sublime text syntax:
+--------------------
+To get syntax higlighting for sublime text, move `gok.tmLanguage` to sublime text data directory.     
+*	windows:     
+		 `%APPDATA%\Sublime Text 3\Package\User\`    
+*	osx:    
+		` ~/Library/Application Support/Sublime Text 3/Package/User`     
+*	linux:     
+		`~/.config/sublime-text-3/Package/User`   

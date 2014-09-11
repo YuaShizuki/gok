@@ -1,0 +1,6 @@
+<?go 
+    if gok.Cookie("tempUserName") != "" {
+        gok.DeleteCookie("tempUserName")
+    }
+    gok.Redirect("/")    
+?>

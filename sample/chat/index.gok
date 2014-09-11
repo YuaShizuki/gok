@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <link href="http://fonts.googleapis.com/css?family=Dosis" rel="stylesheet" type="text/css">
+        <style>
+            body {
+                font-family: 'Dosis', sans-serif;             
+            }
+            <?go if gok.Cookie("tempUserName") == "" { ?>
+                input {
+                    font-size:0.9em
+                    font-weight:light;    
+                }
+            <?go } else { ?>
+                iframe {
+                    display: none; 
+                }
+                a {
+                    float:right;
+                }
+                span {
+                    color: blue
+                }
+                form {
+                    width:100%;
+                }
+                textarea {
+                    font-size:0.9em;
+                    font-weight:light;
+                    width:90%;
+                    height:10%;
+                }
+                .inForm {
+                    color: blue;
+                    float:left;   
+                }
+            <?go } ?>
+        </style>
+        <script src="gok.js"></script>
+        <script>
+            var KeepGettingMsgs = function() {
+                gok.getLatestMessage(function(r){ 
+                    document.getElementById("msg").innerHTML += "<p><span>"+r[0]+":&nbsp&nbsp&nbsp&nbsp</span>"+r[1]+"</p>"
+                    window.setTimeout(KeepGettingMsgs, 10)
+                });
+            }
+        </script>
+    </head>
+    <body onload="KeepGettingMsgs()">  
+        <?go if gok.Cookie("tempUserName") != "" { ?>
+            <a href="/signout.gok">sign out</a>
+            <div id="msg">
+                <p>msgs:</p>    
+            </div>
+            <form target="hidden" action="/msgs.gok" method="POST">
+                <div class="inForm">
+                    <p><?go gok.Echo(gok.Cookie("tempUserName")) ?>:&nbsp&nbsp</p>
+                    <input type="submit" value="post">
+                </div>
+                <div>
+                    <textarea name="message"></textarea>
+                </div>
+            </form>
+            <iframe name="hidden"></iframe>
+        <?go } else { ?>
+            <p>chat room<p>
+            <form action="/signup.gok" method="POST">
+                SignIn Username: <input type="text" name="username">
+                <input type="submit" value="enter">
+            </form>           
+        <?go } ?>
+    </body>
+</html>

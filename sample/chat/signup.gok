@@ -1,0 +1,7 @@
+<?go 
+    if gok.Post("username") != "" { 
+        gok.SetCookie("tempUserName", gok.Post("username"), 0)
+    }
+    gok.Redirect("/")
+?>
+
