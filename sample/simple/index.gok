@@ -1,0 +1,20 @@
+<?go 
+// try changing this file after running `$sudo gok run`.
+// the server will auto update if it detects any changes.   
+?>
+
+<?goimp 
+    "fmt"
+?>
+
+<html>
+    <body>
+        <?go for i := 0; i < 10; i++ { ?>
+            <p>Iteration =&gt&nbsp<span style="color:red"><?go gok.Echo(i) ?></span></p>
+        <?go } ?>
+    </body>
+</html>
+
+<?go 
+    fmt.Println("deliverd content for request => /"+gok.ServerSelf())
+?>
