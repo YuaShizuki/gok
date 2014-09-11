@@ -1,7 +1,7 @@
-genresource
+Genresource
 -----------
-this is a utility is use to convert `../gokserver` to a resource.go file.
-it allows, go binaries to contain resource extraction resource using this utility requires use of just the following snippet
+This is a utility used for converting `../gokserver` to a resource.go file.
+It allows go binaries to contain resource. Extract resource with the following function.
 ```go
 func UnpackResource() {
     orignal, err := hex.DecodeString(Resource)
