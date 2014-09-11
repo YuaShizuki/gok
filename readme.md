@@ -90,4 +90,112 @@ commands:
 	would result in the final server executable.
 
 4. **`$gok api`**    
-	pritnts basic api useable inside of `<?go ?>` tag.
+	pritnts core api for instance `gok`
+
+API:
+----
+*	__gok:__ Core struct encapsulates the http.Request and http.ResponseWriter.     
+	Instance present in all `<?go ?>` tags as `gok`.    
+	```go
+		type Gok struct { ... }
+	```    
+
+*	__Echo:__ Equivalent to php `echo`. echo accepts any type of parameters.
+	```go
+		func (self *Gok) Echo(a ...interface{}) { ... }
+	```
+*	__Redirect:__ redirects the request to a new url    
+
+	```go
+		func (self *Gok) Redirect(newUrl string) { ... }
+	```
+*	__Die:__ sends the `msg` as error, and undoes everything echoed so far.
+
+	```go
+		func (self *Gok) Die(msg string) { ... }
+	```
+*	__Server Functions__ PHP equivalent to $_SERVER[' ']
+    
+    ```go
+        //returns current path, without the leadind '/'
+		func (self *Gok) ServerSelf() string { ... }
+		func (self *Gok) ServerSelf() string { ... }
+		func (self *Gok) ServerHttpUserAgent() string { ... }
+		func (self *Gok) ServerHttpReferer() string { ... }
+		func (self *Gok) ServerHttps() bool { ... }
+		func (self *Gok) ServerRemoteAddr() string { ... }
+        func (self *Gok) ServerRemotePort() string { ... }
+        func (self *Gok) ServerPort() int { ... }
+        func (self *Gok) ServerHttpAcceptEncoding() string { ... }
+        func (self *Gok) ServerProtocol() string { ... }
+        //returns "POST" or "GET"
+        func (self *Gok) ServerRequestMethod() string { ... }
+        func (self *Gok) ServerQueryString() string { ... }
+        func (self *Gok) ServerHttpAccept() string { ... }
+        func (self *Gok) ServerHttpAcceptCharset() string { ... }
+        func (self *Gok) ServerHttpAcceptLanguage() string { ... }
+        func (self *Gok) ServerHttpConnection() string { ... }
+        func (self *Gok) ServerHttpHost() string { ... }
+    ```
+*	__Get and Post:__ PHP equivalent to $_GET[' '] and $_POST[' ']
+
+	```go
+		// parses the post request and returns the post value of `name`,
+		// in case for post containing file date. use gok.File('fileName')
+		func (self *Gok) Post(name string) string { ... }
+
+		// the same as above but for get requests.
+		func (self *Gok) Get(name string) string { ... }
+	```
+
+*	__Cookies:__ PHP  PHP equivalent of $_COOKIE[' ']
+	
+	```go
+		// returns the cookie value for `name`, if no cookie is set returns an
+		// empty string ""
+		func (self *Gok) Cookie(name string) string { ... }
+
+		// sets cookie with name, value, and duration to expire, if duration is 0
+		// cookie is permanent
+		func (self *Gok) SetCookie(name string, value string, duration int64) { ... }
+
+		//delets the cookie set with `name`
+		func (self *Gok) DeleteCookie(name string) { ... }
+
+		//set cookie with extra params
+		func (self *Gok) SetCookie_4(name string, value string, duration int64,
+                                urlPath string){ ... }
+        func (self *Gok) SetCookie_5(name string, value string, duration int64,
+                                urlPath string, domain string) { ... }
+        func (self *Gok) SetCookie_7(name string, value string, duration int64,
+                                urlPath string, domain string, secure bool,
+                                httpOnly bool) { ... }
+	```
+
+*	__File Uploads:__ PHP equivalent of $_FILE[' ']
+
+	```go
+		// File saves the file upload to disk and returns 
+		// (`file path`,`uploaded file name`, `file content type`, `size`).
+		// its important that file uploads occure from form with 
+		// enctype='multipart/form-data' set.
+		func (self *Gok) File(name string) (string, string, string, int64) { ... }
+	```
+
+*	__Header:__ PHP equivalent of $_HEADER[' ']
+
+	```go
+		// sets the header for response.	
+		// ex: gok.Header("Connection:Close")
+		func (self *Gok) Header(header string) { ... }
+	```
+
+*	__Go http.Header:__ returns http.Header for Gok instance
+
+	```go
+		//go htt.Header for request
+		func (self *Gok) RequestHeader() http.Header { ... }
+
+		//go http.Header for Response
+		func (self *Gok) ResponseHeader() http.Header { ... }
+	``` 
