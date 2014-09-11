@@ -148,7 +148,7 @@ API:
 		func (self *Gok) Get(name string) string { ... }
 	```
 
-*	__Cookies:__ PHP  PHP equivalent of $_COOKIE[' ']
+*	__Cookies:__ PHP equivalent of $_COOKIE[' ']
 	
 	```go
 		// returns the cookie value for `name`, if no cookie is set returns an
@@ -199,3 +199,13 @@ API:
 		//go http.Header for Response
 		func (self *Gok) ResponseHeader() http.Header { ... }
 	``` 
+
+*	__http.ResponseWriter__ and __*http.Request__:
+
+	```go
+		// http.ResponseWriter for gok instance
+		func (self *Gok) ResponseWriter() http.ResponseWriter { ... }
+		
+		// *http.Request for gok object
+		func (self *Gok) HttpRequest() *http.Request { ... }
+	```
