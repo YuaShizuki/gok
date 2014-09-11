@@ -18,18 +18,18 @@ installation
 
 gok tags
 --------
-1.	*`<?go ?>`*   
+1.	**`<?go ?>`**  
 	can scope any valid go code. Code scoped in this tag 
 	executes inside a render function. 
 
-2.	*`<?gofn funcName( args ) ( return types ) { go code }?>`*   
+2.	**`<?gofn funcName( args ) ( return types ) { go code }?>`**  
 	allows you to define a global function thats accessible by all ".gok" scripts.
 	functions defined in this tag cannot be methods of objects or types.
 	hence:    	
-	`<?gofn (type) funcName( args ) (return types) { }?>`   
+	`<?gofn (type) funcName( args ) (return types) { } ?>`   
 	would be incorect.
 
-3. *`<?goimp ?>`*   
+3. **`<?goimp ?>`**  
 	tag allows for imports in gok scripts. example   
 	```text
 		<?goimp 
@@ -40,9 +40,9 @@ gok tags
 			<body>
 				...
 	```
-4. *`<?gouse ?>`*   
+4. **`<?gouse ?>`**   
 	gouse tag allows to define global variables, functions   
-	      
+
 	```text
 		<?gouse
 			type nstring string 
@@ -50,6 +50,7 @@ gok tags
 			func (self nstring) () { 
 				fmt.Println(self)
 			}
+			...
 		?>    
 	```
-
+5. **`<?go@fn funcName(args []string) ([]string, error) { go code } ?>`**
