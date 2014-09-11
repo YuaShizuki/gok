@@ -1,0 +1,22 @@
+package main
+import "fmt"
+import "os"
+
+func main() {
+    if len(os.Args) != 2 {
+        printUsage()
+    }
+    switch os.Args[1] {
+        case "build":
+            err := build(false)
+            if err != nil {
+                fmt.Println(err.Error())
+            }
+        case "run":
+            runner()
+        case "src":
+            build(true)
+    }
+}
+
+

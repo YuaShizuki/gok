@@ -12,11 +12,6 @@ Build web apps in go, php style.
 ```
 everything between `<?go` `?>` can be valid go code
 
- - [installation](https://github.com/YuaShizuki/gok#installation)
- - [gok tags](https://github.com/YuaShizuki/gok#gok%20tags)
- - [gok api](https://github.com/YuaShizuki/gok#api)
- - [sublime text syntax highlighting](https://github.com/YuaShizuki/gok#api)
-
 installation:
 -------------
 ```bash
