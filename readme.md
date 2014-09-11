@@ -12,6 +12,12 @@ Build web apps in go, php style.
 ```
 everything between `<?go` `?>` can be valid go code
 
+* [installation](https://github.com/YuaShizuki/gok#installation)
+* [gok tags](https://github.com/YuaShizuki/gok#gok%20tags)
+* [gok api](https://github.com/YuaShizuki/gok#api)
+* [sublime text syntax highlighting]    
+
+
 installation:
 -------------
 ```bash
@@ -89,9 +95,6 @@ commands:
 3. **`$gok src`**    
 	src converts .gok files to genrated .go files, running `$go build` in this directory
 	would result in the final server executable.
-
-4. **`$gok api`**    
-	pritnts core api for instance `gok`
 
 API:
 ----
