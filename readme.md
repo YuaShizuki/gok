@@ -32,7 +32,7 @@ gok tags:
 	`<?gofn (type) funcName( args ) (return types) { } ?>`   
 	would be incorect.
 
-3. **<?goimp ?>** 
+3. **<?goimp ?>**   
 	tag allows for imports in gok scripts. example   
 	```text
 		<?goimp 
@@ -78,4 +78,16 @@ gok tags:
 
 commands:
 ---------
-1. **`$gok build`**
+1. **`$gok build`**   
+	converts .gok file to valid go files and them compiles them to the final executable.
+
+2. **`$gok run`**    
+	gok run builds the executable and runs it, any new changes made to the source
+	would update the the server executable and restart it.
+
+3. **`$gok src`**    
+	src converts .gok files to genrated .go files, running `$go build` in this directory
+	would result in the final server executable.
+
+4. **`$gok api`**    
+	pritnts basic api useable inside of `<?go ?>` tag.
