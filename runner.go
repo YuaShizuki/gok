@@ -23,7 +23,7 @@ import "os"
 import "net"
 import "strings"
 import "regexp"
-import "github.com/YuaShizuki/gok/txtserve"
+import "txtserve"
 import "time"
 
 var controllerListener net.Listener
