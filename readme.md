@@ -215,6 +215,13 @@ To get syntax higlighting for sublime text, move `gok.tmLanguage` to sublime tex
 *	osx:` ~/Library/Application Support/Sublime Text 3/Package/User`     
 *	linux:`~/.config/sublime-text-3/Package/User`
 
+
+TODO:
+----
+*   https support, next week.
+*   websocket support
+*   template genration. making gok easly integratable with martini, and other web serever frame works.
+
 Licensing and Copyright
 -----------------------
 Copyright 2014 Yua Shizuki. All rights reserved.
