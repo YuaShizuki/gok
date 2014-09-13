@@ -84,7 +84,7 @@ commands:
 
 2. **`$gok run`**    
 	gok run builds the executable and then runs it, any new changes made to the source
-	would update the executable, hence restart it.
+	would update the executable, hence restarting it.
 
 3. **`$gok src`**    
 	src converts .gok files to .go files, running `$go build` in this directory
